@@ -1,155 +1,102 @@
 <!DOCTYPE html>
 <html lang="tr">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CBAM Hızlı Sonuçlar - GreFins</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <title>Analiz Sonuçları - GreFins CBAM</title>
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='favicon.png') }}">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        pageBg: '#0B1121',
+                        cardBg: '#151E32',
+                        primary: '#C9FD02',
+                        textMain: '#FFFFFF',
+                        textMuted: '#94A3B8',
+                        borderDark: '#2D3748',
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=4">
 </head>
-<body>
-    <div class="container">
-        <div style="text-align: center; margin-bottom: 2rem;">
-            <div style="display: inline-block; padding: 0.5rem 1rem; background: #eff6ff; border-radius: 20px; margin-bottom: 1rem;">
-                <span style="color: var(--primary); font-weight: 600; font-size: 0.875rem;">🌱 GreFins CBAM Intelligence</span>
-            </div>
-        </div>
-        <h1>✅ CBAM Hızlı Hesaplama Sonucu</h1>
 
-        <div class="result-grid">
-            <div class="result-card">
-                <h3>Toplam Emisyon</h3>
-                <div class="value">{{ "{:,.2f}".format(summary.total_emission) }} tCO2e</div>
-            </div>
-            <div class="result-card">
-                <h3>Gerekli Sertifika</h3>
-                <div class="value">{{ "{:,.2f}".format(summary.certificates) }}</div>
-            </div>
-            <div class="result-card">
-                <h3>CBAM Maliyeti</h3>
-                <div class="value">€{{ "{:,.2f}".format(summary.cbam_cost) }}</div>
+<body class="bg-pageBg text-textMain antialiased py-24 px-6 flex flex-col min-h-screen">
+    <div class="max-w-4xl mx-auto w-full">
+        <div class="flex flex-col items-center mb-20 text-center">
+            <a href="/">
+                <img src="{{ url_for('static', filename='favicon.png') }}" alt="GreFins" class="h-10 w-auto mb-10">
+            </a>
+            <h1 class="text-4xl md:text-5xl font-black tracking-tight mb-4 uppercase">Hesaplama Özeti</h1>
+            <div
+                class="bg-primary/20 text-primary font-black text-[10px] py-1.5 px-4 rounded-full uppercase tracking-widest border border-primary/30">
+                CBAM Statü: Aktif
             </div>
         </div>
 
-        <div class="info-section">
-            <h2>📦 Ürün Bilgileri</h2>
-            <div class="info-row">
-                <span>Ürün:</span>
-                <span>{{ summary.product }}</span>
+        <div class="grid md:grid-cols-3 gap-8 mb-20">
+            <div
+                class="bg-cardBg border border-borderDark rounded-[32px] p-10 shadow-2xl relative overflow-hidden group hover:border-textMuted transition-all">
+                <div class="text-[10px] font-black text-textMuted uppercase tracking-widest mb-3">Toplam Emisyon</div>
+                <div class="text-4xl font-black">{{ "{:,.2f}".format(summary.total_emission) }}</div>
+                <div class="text-[10px] text-textSubtle font-bold mt-2">tCO2e</div>
             </div>
-            <div class="info-row">
-                <span>Kategori:</span>
-                <span>{{ summary.category }}</span>
+            <div
+                class="bg-cardBg border border-borderDark rounded-[32px] p-10 shadow-2xl relative overflow-hidden group hover:border-textMuted transition-all">
+                <div class="text-[10px] font-black text-textMuted uppercase tracking-widest mb-3">Gerekli Sertifika
+                </div>
+                <div class="text-4xl font-black">{{ "{:,.2f}".format(summary.certificates) }}</div>
+                <div class="text-[10px] text-textSubtle font-bold mt-2">Sertifika Adedi</div>
             </div>
-            <div class="info-row">
-                <span>Miktar:</span>
-                <span>{{ "{:,.0f}".format(summary.quantity_tonnes) }} ton</span>
-            </div>
-        </div>
-
-        <div class="info-section">
-            <h2>🌡️ Emisyon Detayları</h2>
-            <div class="info-row">
-                <span>Direkt EI:</span>
-                <span>{{ summary.direct_ei }} tCO2/ton</span>
-            </div>
-            <div class="info-row">
-                <span>İndirekt EI:</span>
-                <span>{{ summary.indirect_ei }} tCO2/ton</span>
-            </div>
-            <div class="info-row">
-                <span>Toplam EI:</span>
-                <span><strong>{{ summary.total_ei }} tCO2/ton</strong></span>
+            <div
+                class="bg-cardBg border border-primary/50 rounded-[32px] p-10 shadow-2xl relative overflow-hidden group border-t-4 border-t-primary bg-[rgba(201,253,2,0.02)]">
+                <div class="text-[10px] font-black text-primary uppercase tracking-widest mb-3">Toplam CBAM Maliyeti
+                </div>
+                <div class="text-5xl font-black text-primary">€{{ "{:,.2f}".format(summary.cbam_cost) }}</div>
+                <div class="text-[10px] text-primary/60 font-black mt-2">Tahmini Vergi Yükü</div>
             </div>
         </div>
 
-        {% if detailed_data %}
-        <div class="info-section" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
-            <h2 style="color: white;">🔬 Detaylı Emisyon Analizi</h2>
-            
-            {% if detailed_data.reporting %}
-            <div style="background: rgba(255,255,255,0.1); padding: 15px; border-radius: 8px; margin: 10px 0;">
-                <h3 style="color: #fde047; margin-bottom: 10px;">📍 Tesis Bilgileri</h3>
-                {% if detailed_data.reporting.plant_id %}
-                <div class="info-row"><span>🏭 Tesis ID:</span><span><strong>{{ detailed_data.reporting.plant_id }}</strong></span></div>
-                {% endif %}
-                {% if detailed_data.reporting.country_code %}
-                <div class="info-row"><span>🌍 Ülke:</span><span><strong>{{ detailed_data.reporting.country_code }}</strong></span></div>
-                {% endif %}
-                {% if detailed_data.reporting.reporting_year %}
-                <div class="info-row"><span>📅 Yıl:</span><span><strong>{{ detailed_data.reporting.reporting_year }}</strong></span></div>
-                {% endif %}
-                {% if detailed_data.reporting.production_route %}
-                <div class="info-row"><span>⚙️ Üretim Rotası:</span><span><strong>{{ detailed_data.reporting.production_route }}</strong></span></div>
-                {% endif %}
-                {% if detailed_data.reporting.electricity_source %}
-                <div class="info-row"><span>⚡ Elektrik Kaynağı:</span><span><strong>{{ detailed_data.reporting.electricity_source }}</strong></span></div>
-                {% endif %}
-            </div>
-            {% endif %}
-            
-            {% if detailed_data.scope1 %}
-            <div style="background: rgba(255,255,255,0.1); padding: 15px; border-radius: 8px; margin: 10px 0;">
-                <h3 style="color: #fde047; margin-bottom: 10px;">🔥 Scope 1 - Doğrudan Emisyonlar</h3>
-                {% if detailed_data.scope1.fuel %}
-                <p style="font-weight: bold; color: #fef3c7;">Yakıt Tüketimi:</p>
-                {% if detailed_data.scope1.fuel.coking_coal_ton > 0 %}
-                <div class="info-row"><span>🪨 Kok Kömürü:</span><span><strong>{{ "{:,.2f}".format(detailed_data.scope1.fuel.coking_coal_ton) }} ton</strong></span></div>
-                {% endif %}
-                {% if detailed_data.scope1.fuel.natural_gas_nm3 > 0 %}
-                <div class="info-row"><span>🔥 Doğalgaz:</span><span><strong>{{ "{:,.2f}".format(detailed_data.scope1.fuel.natural_gas_nm3) }} Nm³</strong></span></div>
-                {% endif %}
-                {% if detailed_data.scope1.fuel.fuel_oil_ton > 0 %}
-                <div class="info-row"><span>🛢️ Fuel Oil:</span><span><strong>{{ "{:,.2f}".format(detailed_data.scope1.fuel.fuel_oil_ton) }} ton</strong></span></div>
-                {% endif %}
-                {% endif %}
-                
-                {% if detailed_data.scope1.process %}
-                <p style="font-weight: bold; color: #fef3c7; margin-top: 10px;">Süreç Emisyonları:</p>
-                {% if detailed_data.scope1.process.limestone_ton > 0 %}
-                <div class="info-row"><span>⚪ Kireçtaşı:</span><span><strong>{{ "{:,.2f}".format(detailed_data.scope1.process.limestone_ton) }} ton</strong></span></div>
-                {% endif %}
-                {% endif %}
-                
-                {% if detailed_data.scope1.thermal_systems and detailed_data.scope1.thermal_systems.reheating_fuel_nm3 > 0 %}
-                <div class="info-row"><span>🔄 Reheating Yakıtı:</span><span><strong>{{ "{:,.2f}".format(detailed_data.scope1.thermal_systems.reheating_fuel_nm3) }} Nm³</strong></span></div>
-                {% endif %}
-                
-                {% if detailed_data.scope1.steel_output_ton > 0 %}
-                <div class="info-row"><span>🏗️ Çelik Üretimi:</span><span><strong>{{ "{:,.2f}".format(detailed_data.scope1.steel_output_ton) }} ton</strong></span></div>
-                {% endif %}
-            </div>
-            {% endif %}
-            
-            {% if detailed_data.scope2 %}
-            <div style="background: rgba(255,255,255,0.1); padding: 15px; border-radius: 8px; margin: 10px 0;">
-                <h3 style="color: #fde047; margin-bottom: 10px;">⚡ Scope 2 - Dolaylı Emisyonlar</h3>
-                {% if detailed_data.scope2.electricity.electricity_consumption_mwh > 0 %}
-                <div class="info-row"><span>💡 Elektrik Tüketimi:</span><span><strong>{{ "{:,.2f}".format(detailed_data.scope2.electricity.electricity_consumption_mwh) }} MWh</strong></span></div>
-                {% endif %}
-                {% if detailed_data.scope2.electricity.grid_emission_factor_kgco2_kwh > 0 %}
-                <div class="info-row"><span>📊 Grid Emisyon Faktörü:</span><span><strong>{{ detailed_data.scope2.electricity.grid_emission_factor_kgco2_kwh }} kgCO2/kWh</strong></span></div>
-                {% endif %}
-                {% if detailed_data.scope2.electricity.renewable_share_percent > 0 %}
-                <div class="info-row"><span>🌱 Yenilenebilir Enerji:</span><span><strong>{{ detailed_data.scope2.electricity.renewable_share_percent }}%</strong></span></div>
-                {% endif %}
-            </div>
-            {% endif %}
-            
-            {% if detailed_data.data_quality %}
-            <div style="background: rgba(255,255,255,0.1); padding: 15px; border-radius: 8px; margin: 10px 0;">
-                <h3 style="color: #fde047; margin-bottom: 10px;">📋 Veri Kalitesi</h3>
-                {% if detailed_data.data_quality.natural_gas_nm3 %}
-                <div class="info-row"><span>🔍 Doğalgaz:</span><span><strong>{{ detailed_data.data_quality.natural_gas_nm3.quality|upper }}</strong></span></div>
-                {% endif %}
-                {% if detailed_data.data_quality.electricity_consumption_mwh %}
-                <div class="info-row"><span>🔍 Elektrik:</span><span><strong>{{ detailed_data.data_quality.electricity_consumption_mwh.quality|upper }}</strong></span></div>
-                {% endif %}
-            </div>
-            {% endif %}
-        </div>
-        {% endif %}
+        <div class="bg-cardBg border border-borderDark rounded-[32px] p-12 shadow-2xl mb-12">
+            <h2 class="text-sm font-black uppercase tracking-[0.3em] text-white mb-10 border-l-4 border-primary pl-6">
+                Analiz Detayları</h2>
 
-        <a href="/" class="back-button">⬅️ Yeni Hesaplama</a>
+            <div class="grid md:grid-cols-2 gap-x-16 gap-y-1">
+                <div class="flex justify-between items-center py-6 border-b border-borderDark/40">
+                    <span class="text-xs font-black text-textMuted uppercase tracking-widest">Ürün</span>
+                    <span class="font-bold text-lg">{{ summary.product }}</span>
+                </div>
+                <div class="flex justify-between items-center py-6 border-b border-borderDark/40">
+                    <span class="text-xs font-black text-textMuted uppercase tracking-widest">Kategori</span>
+                    <span class="font-bold text-lg">{{ summary.category }}</span>
+                </div>
+                <div class="flex justify-between items-center py-6 border-b border-borderDark/40">
+                    <span class="text-xs font-black text-textMuted uppercase tracking-widest">Miktar</span>
+                    <span class="font-bold text-lg">{{ "{:,.0f}".format(summary.quantity_tonnes) }} ton</span>
+                </div>
+                <div class="flex justify-between items-center py-6 border-b border-borderDark/40">
+                    <span class="text-xs font-black text-textMuted uppercase tracking-widest">Emisyon Yoğunluğu</span>
+                    <span class="text-primary font-black text-lg">{{ summary.total_ei }} tCO2/t</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-auto flex flex-col md:flex-row gap-6 justify-center">
+            <a href="/"
+                class="bg-white/5 border border-borderDark hover:border-textMuted text-white font-black text-xs px-12 py-5 rounded-full transition-all uppercase tracking-widest text-center">
+                Yeni Analiz Başlat
+            </a>
+            <a href="/cn-codes"
+                class="bg-primary hover:bg-primaryHover text-pageBg font-black text-xs px-12 py-5 rounded-full transition-all uppercase tracking-widest text-center">
+                Veritabanına Dön
+            </a>
+        </div>
     </div>
 </body>
+
 </html>

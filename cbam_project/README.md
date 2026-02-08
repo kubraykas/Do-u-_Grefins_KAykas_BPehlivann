@@ -14,6 +14,33 @@ Profesyonel modüler AB CBAM (Carbon Border Adjustment Mechanism) hesaplama, ETS
 
 ---
 
+#
+
+Mevcut sisteme ek olarak, aşağıdaki profesyonel özellikler entegre edilmiştir:
+
+### 1. 💎 Premium Arayüz ve İnteraktif Grafikler
+- **Dark Mode UI**: Göz yormayan, modern ve kurumsal "Dark Mode" tasarımı.
+- **Chart.js Entegrasyonu**: Emisyon dağılımı ve maliyet projeksiyonları için canlı, interaktif grafikler.
+- **Dashboard**: "Banka Hazır" ve "Düşük Risk" indikatörleri ile anlık durum takibi.
+
+### 2. ☁️ AWS DynamoDB Entegrasyonu
+- **Bulut Kayıt**: Tüm analiz raporları artık AWS DynamoDB üzerinde güvenle saklanıyor.
+- **UUID Takibi**: Her rapor için benzersiz kimlik (UUID) oluşturuluyor.
+
+### 3. 🤖 Gelişmiş AI Strateji Raporları
+- **Stratejik Odak**: "Maliyet" yerine "Sermaye Kazanımı" odaklı yönetici raporları.
+- **Markdown Rendering**: Yapay zeka çıktıları artık temiz, okunabilir formatta (kalın başlıklar, listeler) sunuluyor.
+
+### 4. 📄 Profesyonel PDF Çıktısı
+- **Markalı Tasarım**: Enerji yeşili konseptine uygun, logolu ve grafikli PDF raporu.
+- **Table of Contents**: Otomatik içindekiler tablosu ve yönetici özeti.
+
+### 5. 🔬 Kapsamlı Emisyon Analizi (Scope 1 & 2)
+- **Detaylı Girdi**: Doğalgaz, elektrik, kömür gibi kaynak bazlı emisyon hesaplama.
+- **Optimizasyon**: ROI (Yatırım Getirisi) hesaplamalı iyileştirme senaryoları.
+
+---
+
 ##  İçindekiler
 
 - [Özellikler](#-özellikler)

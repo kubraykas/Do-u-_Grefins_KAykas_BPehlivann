@@ -1,19 +1,63 @@
 <!DOCTYPE html>
 <html lang="tr">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hata - GreFins CBAM</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <title>İşlem Hatası - GreFins CBAM</title>
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='favicon.png') }}">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        pageBg: '#0B1121',
+                        cardBg: '#151E32',
+                        primary: '#C9FD02',
+                        textMain: '#FFFFFF',
+                        textMuted: '#94A3B8',
+                        borderDark: '#2D3748',
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=4">
 </head>
-<body>
-    <div class="container" style="text-align: center;">
-        <div style="display: inline-block; padding: 0.5rem 1rem; background: #eff6ff; border-radius: 20px; margin-bottom: 1rem;">
-            <span style="color: var(--primary); font-weight: 600; font-size: 0.875rem;">🌱 GreFins CBAM Intelligence</span>
+
+<body class="bg-pageBg text-textMain antialiased min-h-screen flex items-center justify-center py-20 px-6">
+    <div class="max-w-xl w-full">
+        <div class="text-center mb-16">
+            <a href="/">
+                <img src="{{ url_for('static', filename='favicon.png') }}" alt="GreFins"
+                    class="h-12 w-auto mx-auto mb-10 opacity-50">
+            </a>
+            <h1 class="text-3xl font-black uppercase tracking-tighter mb-4">Sistem Mesajı</h1>
+            <div class="w-12 h-1 bg-red-400 mx-auto rounded-full"></div>
         </div>
-        <h1>❌ Bir Hata Oluştu</h1>
-        <div class="error-box">{{ error }}</div>
-        <a href="/" class="back-button">⬅️ Ana Sayfa</a>
+
+        <div
+            class="bg-cardBg border border-borderDark rounded-[32px] p-12 shadow-2xl relative overflow-hidden text-center">
+            <div class="absolute top-0 left-0 w-full h-1.5 bg-red-400"></div>
+
+            <h2 class="text-xl font-black text-white mb-8 tracking-widest uppercase">Analiz Tamamlanamadı</h2>
+
+            <div
+                class="bg-red-400/5 border border-red-400/10 rounded-2xl p-8 mb-12 text-sm text-left font-mono text-red-300 leading-relaxed overflow-auto max-h-60 custom-scrollbar">
+                {{ error }}
+            </div>
+
+            <a href="/"
+                class="bg-primary hover:bg-primaryHover text-pageBg font-black text-sm px-14 py-5 rounded-full transition-all inline-block uppercase tracking-widest shadow-xl">
+                Giriş Sayfasına Dön
+            </a>
+        </div>
+
+        <div class="mt-12 text-center text-[10px] font-black text-textMuted uppercase tracking-[0.4em] opacity-30">
+            Reference Error ID: 0x2291
+        </div>
     </div>
 </body>
+
 </html>

@@ -8,6 +8,10 @@ import os
 import sys
 from dotenv import load_dotenv
 from datetime import datetime
+import json
+import boto3
+from decimal import Decimal
+import uuid
 
 # Ana proje yolunu ekle
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
@@ -36,6 +40,53 @@ app.secret_key = os.getenv('SECRET_KEY', 'cbam-secret-key-2026')
 
 # Global storage for last report data (for PDF generation)
 app.last_report_data = None
+
+# AWS DynamoDB Configuration
+def get_db_table():
+    try:
+        session = boto3.Session(
+            aws_access_key_id=os.getenv('AWS_ACCESS_KEY_ID'),
+            aws_secret_access_key=os.getenv('AWS_SECRET_ACCESS_KEY'),
+            region_name=os.getenv('AWS_DEFAULT_REGION')
+        )
+        dynamodb = session.resource('dynamodb')
+        return dynamodb.Table('GrefinsReports')
+    except Exception as e:
+        print(f"❌ AWS Bağlantı Hatası: {e}")
+        return None
+
+def convert_to_decimal(obj):
+    """DynamoDB için float değerleri Decimal'e çevirir"""
+    if isinstance(obj, list):
+        return [convert_to_decimal(i) for i in obj]
+    elif isinstance(obj, dict):
+        return {k: convert_to_decimal(v) for k, v in obj.items()}
+    elif isinstance(obj, float):
+        return Decimal(str(obj))
+    return obj
+
+def save_report_to_aws(data):
+    """Veriyi AWS DynamoDB'ye kaydet"""
+    table = get_db_table()
+    if not table:
+        return False
+    
+    try:
+        # report_id Partition Key'dir
+        if 'report_id' not in data:
+            data['report_id'] = str(uuid.uuid4())
+            
+        data['created_at'] = datetime.now().isoformat()
+        
+        # Decimal dönüşümü
+        db_data = convert_to_decimal(data)
+        
+        table.put_item(Item=db_data)
+        print(f"✅ Veri AWS'ye kaydedildi: {data['report_id']}")
+        return True
+    except Exception as e:
+        print(f"❌ AWS Kayıt Hatası: {e}")
+        return False
 
 
 @app.route('/')
@@ -119,6 +170,15 @@ def calculate():
             return render_template('error.html', 
                                  error="CN Code bulunamadı!")
         
+        # AWS'ye kaydet
+        aws_data = {
+            'type': 'simple_calculation',
+            'summary': summary,
+            'detailed_data': detailed_data if detailed_data else {},
+            'timestamp': datetime.now().isoformat()
+        }
+        save_report_to_aws(aws_data)
+        
         return render_template('results.html', 
                              summary=summary, 
                              detailed_data=detailed_data if detailed_data else None)
@@ -170,6 +230,16 @@ def full_analysis():
         
         if cbam_summary is None:
             return render_template('error.html', error="CN Code bulunamadı!")
+        
+        # Company info for reports
+        company_info = {
+            'company_name': request.form.get('company_name', 'Firma'),
+            'origin_country': request.form.get('country_code', 'TR'),
+            'product_name': cbam_summary['product'],
+            'cn_code': cn_code,
+            'quantity': quantity,
+            'embedded_emissions': cbam_summary['total_ei']
+        }
         
         # === YENİ: SCOPE 1 & 2 ANALİZİ ===
         emission_analysis = None
@@ -242,15 +312,15 @@ def full_analysis():
         
         # Session'a kaydet (sadece özet bilgiler - cookie limiti için)
         session['last_report'] = {
-            'cbam_cost': cbam_summary['total_cost'],
-            'total_emissions': emission_analysis.get('total_emissions', 0),
+            'cbam_cost': cbam_summary['cbam_cost'],
+            'total_emissions': emission_analysis.get('total_emissions', 0) if emission_analysis else 0,
             'timestamp': datetime.now().isoformat()
         }
         
         # Tam rapor verisini app context'e kaydet (PDF için)
         app.last_report_data = {
             'cbam_summary': cbam_summary,
-            'ets_forecast': ets_forecast,
+            'ets_forecast': report['cbam_df'],
             'report_text': report['report_text'],
             'emission_analysis': emission_analysis,
             'optimization_scenarios': optimization_scenarios,
@@ -289,10 +359,10 @@ CBAM ANALİZ RAPORU
 CBAM MALİYET ÖZETİ
 {'='*80}
 
-  Toplam Emisyon: {cbam_summary['total_emissions']:,.2f} tCO2e
-  Ortalama ETS Fiyatı: €{cbam_summary['avg_ets_price']:.2f}/tCO2
-  Toplam CBAM Maliyeti: €{cbam_summary['total_cost']:,.2f}
-  Birim Maliyet: €{cbam_summary['cost_per_ton']:.2f}/ton ürün
+  Toplam Emisyon: {cbam_summary['total_emission']:,.2f} tCO2e
+  ETS Fiyatı: €{cbam_summary['ets_price']:.2f}/tCO2
+  Toplam CBAM Maliyeti: €{cbam_summary['cbam_cost']:,.2f}
+  Birim Maliyet: €{cbam_summary['cbam_cost']/quantity:.2f}/ton ürün
 
 {'='*80}
 ETS FİYAT TAHMİNLERİ (İlk 8 Çeyrek)
@@ -362,6 +432,22 @@ ETS FİYAT TAHMİNLERİ (İlk 8 Çeyrek)
             print(f"\n⚠️ Rapor kaydetme hatası: {e}")
             # Hata olsa bile devam et
         
+        # === AWS DYNAMODB KAYIT ===
+        try:
+            full_aws_data = {
+                'type': 'full_analysis',
+                'company_info': company_info,
+                'cbam_summary': cbam_summary,
+                'emission_analysis': emission_analysis,
+                'ets_forecast': ets_forecast.to_dict('records')[:8] if hasattr(ets_forecast, 'to_dict') else [],
+                'optimization_scenarios': optimization_scenarios if optimization_scenarios else [],
+                'report_text': report.get('report_text', ''),
+                'timestamp': datetime.now().isoformat()
+            }
+            save_report_to_aws(full_aws_data)
+        except Exception as aws_e:
+            print(f"⚠️ AWS full_analysis kayıt hatası: {aws_e}")
+
         # Sonuçları render et
         return render_template('full_results.html',
                              cbam_summary=cbam_summary,
@@ -422,7 +508,7 @@ if __name__ == '__main__':
     print("\n" + "="*70)
     print("🌍 CBAM WEB UYGULAMASI")
     print("="*70)
-    print("\n📱 Adres: http://localhost:5000")
+    print("\n📱 Adres: http://localhost:5001")
     print("🛑 Durdurmak için: CTRL+C\n")
     
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    app.run(debug=True, host='0.0.0.0', port=5001)

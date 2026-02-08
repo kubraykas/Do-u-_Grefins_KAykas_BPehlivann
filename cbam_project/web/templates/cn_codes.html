@@ -1,48 +1,96 @@
 <!DOCTYPE html>
 <html lang="tr">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CN Kod Veritabanı - GreFins CBAM</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='favicon.png') }}">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        pageBg: '#0B1121',
+                        cardBg: '#151E32',
+                        primary: '#C9FD02',
+                        textMain: '#FFFFFF',
+                        textMuted: '#94A3B8',
+                        borderDark: '#2D3748',
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=4">
 </head>
-<body>
-    <div class="container">
-        <div style="text-align: center; margin-bottom: 1rem;">
-            <div style="display: inline-block; padding: 0.5rem 1rem; background: #eff6ff; border-radius: 20px; margin-bottom: 1rem;">
-                <span style="color: var(--primary); font-weight: 600; font-size: 0.875rem;">🌱 GreFins CBAM Intelligence</span>
+
+<body class="bg-pageBg text-textMain antialiased py-24 px-6 flex flex-col min-h-screen">
+    <div class="max-w-6xl mx-auto w-full">
+        <div class="flex flex-col items-center mb-16 text-center">
+            <a href="/">
+                <img src="{{ url_for('static', filename='favicon.png') }}" alt="GreFins" class="h-10 w-auto mb-10">
+            </a>
+            <h1 class="text-4xl font-black mb-4 uppercase tracking-tighter">CN Kodları Veritabanı</h1>
+            <p class="text-textMuted text-[10px] font-black uppercase tracking-[0.4em] opacity-60">{{ codes|length }}
+                Onaylı Ürün Kaydı</p>
+        </div>
+
+        <div class="mb-12 max-w-2xl mx-auto">
+            <div class="relative group">
+                <input type="text" id="searchBox" placeholder="Filtrele: Ürün adı veya CN kodu..."
+                    class="w-full bg-pageBg border border-borderDark focus:border-primary rounded-full px-16 py-5 text-white font-bold outline-none transition-all shadow-xl">
+                <div
+                    class="absolute left-6 top-1/2 -translate-y-1/2 text-textMuted group-focus-within:text-primary transition-colors">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
+                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                    </svg>
+                </div>
             </div>
         </div>
-        <h1>📚 CN Kodları Veritabanı ({{ codes|length }} Ürün)</h1>
-        
-        <input type="text" class="search-box" id="searchBox" placeholder="🔍 Ara...">
 
-        <table>
-            <thead>
-                <tr>
-                    <th>CN Kodu</th>
-                    <th>Açıklama</th>
-                    <th>Kategori</th>
-                    <th>EI (tCO2/t)</th>
-                </tr>
-            </thead>
-            <tbody id="codesTable">
-                {% for code in codes %}
-                <tr>
-                    <td><strong>{{ code.code }}</strong></td>
-                    <td>{{ code.description }}</td>
-                    <td>{{ code.category }}</td>
-                    <td>{{ code.total_ei }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+        <div class="overflow-x-auto border border-borderDark rounded-[32px] bg-cardBg shadow-2xl overflow-hidden">
+            <table class="w-full text-sm">
+                <thead>
+                    <tr
+                        class="bg-[#0F1629] text-textMuted font-black text-[10px] uppercase tracking-[0.25em] text-left border-b border-borderDark">
+                        <th class="p-8">CN Kodu</th>
+                        <th class="p-8">Açıklama</th>
+                        <th class="p-8">Kategori</th>
+                        <th class="p-8 text-right">EI (tCO2/t)</th>
+                    </tr>
+                </thead>
+                <tbody id="codesTable" class="divide-y divide-borderDark/40">
+                    {% for code in codes %}
+                    <tr class="hover:bg-white/[0.03] transition-colors group">
+                        <td class="p-8 font-black text-primary text-base">{{ code.code }}</td>
+                        <td class="p-8 font-medium text-textMain leading-relaxed">{{ code.description }}</td>
+                        <td class="p-8">
+                            <span
+                                class="text-[9px] font-black uppercase tracking-widest py-1.5 px-3 bg-pageBg border border-borderDark rounded-full text-textMuted group-hover:border-primary/40 transition-all">
+                                {{ code.category }}
+                            </span>
+                        </td>
+                        <td class="p-8 text-right font-mono font-black text-white bg-white/[0.01]">{{ code.total_ei }}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
 
-        <a href="/" class="back-button">⬅️ Ana Sayfa</a>
+        <div class="mt-16 text-center">
+            <a href="/"
+                class="bg-white/5 border border-borderDark hover:border-textMuted text-white font-black text-xs px-12 py-5 rounded-full transition-all uppercase tracking-widest inline-block">
+                Hesaplayıcıya Dön
+            </a>
+        </div>
     </div>
 
     <script>
-        document.getElementById('searchBox').addEventListener('keyup', function() {
+        document.getElementById('searchBox').addEventListener('keyup', function () {
             const term = this.value.toLowerCase();
             document.querySelectorAll('#codesTable tr').forEach(row => {
                 row.style.display = row.textContent.toLowerCase().includes(term) ? '' : 'none';
@@ -50,4 +98,5 @@
         });
     </script>
 </body>
+
 </html>

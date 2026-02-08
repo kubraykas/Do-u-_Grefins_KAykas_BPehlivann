@@ -301,53 +301,70 @@ Aşağıdaki başlıklar altında **yönetici raporu** hazırla:
 ✓ "Mevcut kullanım: X ton/Nm³/MWh → Önerilen hedef: Y → Tasarruf: Z tCO2"
 ✓ Gerçek sayıları raporda belirt ve üzerine öneriler sun
 
-### 1. EXECUTIVE SUMMARY (Yönetici Özeti)
-- Toplam CBAM risk tutarı ve emisyon profili özeti (SAYILARLA)
-- Ana bulgular (2-3 cümle, yukarıdaki GERÇEK verilerden çıkarım)
-- Kritik dönemler ve en büyük emisyon kaynakları
+### 1.  EXECUTIVE SUMMARY (Yönetici Özeti)
+- **Stratejik Görünüm**: Toplam CBAM risk tutarı ve emisyon profili özeti (SAYILARLA).
+- **Temel Bulgular**: Yukarıdaki verilerden hareketle firmanın karbon maliyet maruziyeti.
+- **Odak Noktaları**: Kritik dönemler ve en büyük emisyon kaynakları.
 
-### 2. RISK ANALİZİ
-- Yüksek riskli dönemler (ETS fiyat artışı ile ilişkilendir)
-- ETS fiyat volatilitesi (€/tCO2 bazında)
-- Maliyet artış trendleri (yıllık % olarak)
+### 2.  FİNANSAL RİSK VE ETS ANALİZİ
+- **Maliyet Projeksiyonu**: ETS fiyat artışlarının CBAM maliyetlerine kümülatif etkisi.
+- **Volatilite Analizi**: Fiyat dalgalanmalarının bütçe planlamasına etkileri.
+- **Trend Analizi**: 2030'a kadar beklenen maliyet artış yüzdeleri.
 
-### 3. EMİSYON ANALİZİ (Scope 1 & 2) - **ZORUNLU: GERÇEK VERİ KULLAN**
-Yukarıdaki tablodaki SAYISAL verileri kullanarak:
-- Her kaynak için mevcut kullanım MİKTARI (örn: "Kok Kömürü: 1,500 ton → 2,400 tCO2 emisyon")
-- Toplam emisyon içindeki PAY (% olarak hesapla)
-- En yüksek 3 emisyon kaynağını sırala ve değerlerini belirt
-- Her kaynak için iyileştirme potansiyeli değerlendir
+### 3.  DETAYLI EMİSYON PROFİLİ (Scope 1 & 2)
+**ZORUNLU: Yukarıdaki tablodaki SAYISAL verileri kullanarak:**
+- **Kaynak Analizi**: Her kaynak için mevcut kullanım MİKTARI (örn: "Doğalgaz: 2,500,000 Nm³ → X tCO2 emisyon").
+- **Yoğunluk Analizi**: Toplam emisyon içindeki % paylar ve verimlilik göstergeleri.
+- **Kritik Emisyon Kaynakları**: En yüksek 3 emisyon kaynağının detaylı dökümü.
 
-### 4. OPTİMİZASYON FIRSATLARİ - **SAYISAL HEDEFLERLE**
-Her senaryo için HESAPLANMIŞ somut öneriler:
-- Yukarıdaki optimizasyon senaryolarını kullanarak her kaynak için:
-  * "Mevcut: X ton/Nm³ → Hedef: Y ton/Nm³ (%Z azaltım) = W tCO2 tasarruf"
-- Her öneri için yatırım tutarı ve geri ödeme süresi
-- ROI hesabı (CBAM tasarrufu / yatırım maliyeti)
-- Önceliklendirme (hızlı kazanç vs uzun vadeli yatırım)
+### 4.  OPTİMİZASYON VE TASARRUF FIRSATLARI
+**SAYISAL HEDEFLERLE:**
+- **Verimlilik Senaryoları**: Her optimizasyon senaryosu için somut değişim hedefleri.
+  * "Mevcut: X → Hedef: Y (%Z azaltım) = W tCO2 tasarruf"
+- **Yatırım Analizi**: Önerilen önlemler için yatırım tutarı, ROI ve geri ödeme süreleri.
+- **Önceliklendirme**: Finansal ve emisyon açısından en efektif adımlar.
 
-### 5. STRATEJİK ÖNERİLER - **FİRMANIN GERÇEK VERİLERİNE ÖZEL**
-Firmadaki mevcut tüketim bazında SOMUT adımlar:
-- Kısa vadeli (2025-2026): Operasyonel değişikliklerle hızlı kazanımlar (sayısal hedefler)
-- Orta vadeli (2027-2028): Teknoloji yatırımları ile spesifik emisyon azaltımları
-- Uzun vadeli (2029-2030): Toplam emisyon hedefi (başlangıca göre %X azalım)
+### 5.  STRATEJİK YOL HARİTASI
+- **Kısa Vadeli (2025-2026)**: Hızlı kazanımlar ve operasyonel iyileştirmeler.
+- **Orta Vadeli (2027-2028)**: Teknoloji ve enerji dönüşümü yatırımları.
+## GÖREV: STRATEJİK CBAM VE YEŞİL FİNANSMAN ANALİZ RAPORU
 
-### 6. FİNANSAL ETKİ - **EURO BAZINDA NET HESAPLAR**
-Hesaplanmış tasarruf potansiyelleri:
-- Şu anki durum: CBAM maliyeti €X
-- Optimizasyon Senaryo 1 ile: €Y tasarruf (%Z azalım)
-- Optimizasyon Senaryo 2 ile: €W tasarruf (%V azalım)
-- Toplam yatırım ihtiyacı vs. 5 yıllık tasarruf karşılaştırması
+Aşağıdaki başlıklar altında, tamamen **stratejik avantaj ve finansman odaklı** bir yönetici raporu hazırla:
 
-### 7. SONUÇ VE TAVSİYELER
+**ÖNEMLİ TALİMATLAR**: 
+1. Raporu profesyonel bir iş diliyle (Executive Tone) hazırla.
+2. Metin içinde ham madde işaretleri (örneğin sadece * veya -) yerine, yapılandırılmış Markdown başlıkları ve temiz paragraflar kullan.
+3. Formülasyon: "Mevcut Durum → Verimlilik Artışı → CBAM Tasarrufu + Artan Yeşil Finansman Kapasitesi"
+4. Raporu "Ek Maliyet" yerine "Sermaye Geri Kazanımı ve Pazar Liderliği" penceresinden kurgula.
+
+### 1. 📋 YÖNETİCİ ÖZETİ (Stratejik Fırsat Penceresi)
+- CBAM'ın pazar payını artırmak için sunduğu stratejik kaldıracın analizi.
+- Toplam maliyet maruziyeti ve iyileştirme ile geri kazanılabilecek sermaye projeksiyonu.
+
+### 2. ⚖️ FİNANSAL RİSK VE ETS PAZAR ANALİZİ
+- 2030 projeksiyonunda nakit akışı üzerindeki etki ve maliyetlerin finansal tahakkumu.
+- EU ETS piyasası dalgalanmalarına karşı önerilen finansal hedging (korunma) stratejileri.
+
+### 3. 🔬 EMİSYON PROFİLİ VE VERİMLİLİK ANALİZİ
+- Kritik emisyon kaynaklarının dökümü ve üretim verimliliği ile ilişkisi.
+- EU ETS benchmarklarına göre firmanın mevcut konumu ve "Opportunity Gap" analizi.
+
+### 4. 📈 YEŞİL FİNANSMAN VE YATIRIM STRATEJİLERİ
+- Emisyon azaltım projelerinin "Self-Financing" (Tasarruflarla kendini ödeme) performansı.
+- Önerilen yatırımların Sürdürülebilirlik Bağlantılı Krediler (SLL) için nasıl bir çarpan etkisi yaratacağı.
+
+### 5. 🚀 STRATEJİK YOL HARİTASI VE SERMAYE KAZANIMI
+- Kısa, orta ve uzun vadeli operasyonel mükemmeliyet hedefleri.
+- Karbon nötr hedefleri doğrultusunda AB pazarında kazanılacak "Premium" marka değeri.
+
+### 6. 💰 NET FİNANSAL ETKİ VE SONUÇ
 
 ---
-**NOT**: Rapor Türkçe olmalı, profesyonel ve net bir dille yazılmalı. Rakamları vurgula.
+**NOT**: Rapor Türkçe, analitik ve ikna edici olmalı. Önemli sayıları ve stratejik terimleri **kalın (bold)** yap.
 """
-        
         return prompt
     
-    def generate_report(self, cbam_summary, ets_forecast_table, cbam_cost_response, emission_analysis=None, optimization_scenarios=None, model="gemini-2.5-flash"):
+    def generate_report(self, cbam_summary, ets_forecast_table, cbam_cost_response, emission_analysis=None, optimization_scenarios=None, model="gemini-1.5-flash"):
         """
         Generate complete executive CBAM report
         
@@ -363,7 +380,7 @@ Hesaplanmış tasarruf potansiyelleri:
             dict: Report results including metrics, dataframes, and report text
         """
         print("\n" + "="*70)
-        print("📊 CBAM YÖNETİCİ RAPORU ÜRETİLİYOR...")
+        print(" CBAM YÖNETİCİ RAPORU ÜRETİLİYOR...")
         print("="*70 + "\n")
         
         # Parse CBAM cost table
@@ -401,7 +418,7 @@ Hesaplanmış tasarruf potansiyelleri:
         print("="*70 + "\n")
         print(report_text)
         print("\n" + "="*70)
-        print("✅ Rapor başarıyla oluşturuldu")
+        print(" Rapor başarıyla oluşturuldu")
         print("="*70 + "\n")
         
         return {
@@ -426,4 +443,4 @@ Hesaplanmış tasarruf potansiyelleri:
             f.write("="*70 + "\n\n")
             f.write(report_result['report_text'])
         
-        print(f"✅ Rapor kaydedildi: {output_path}")
+        print(f" Rapor kaydedildi: {output_path}")

@@ -13,6 +13,10 @@ from reportlab.lib.enums import TA_CENTER, TA_LEFT, TA_RIGHT, TA_JUSTIFY
 from reportlab.pdfgen import canvas
 from datetime import datetime
 import io
+import matplotlib.pyplot as plt
+import matplotlib
+matplotlib.use('Agg')  # Use non-interactive backend
+import pandas as pd
 
 
 class CBAMPDFGenerator:
@@ -80,6 +84,15 @@ class CBAMPDFGenerator:
             rightIndent=20,
             fontName='Helvetica-Bold'
         ))
+        self.styles.add(ParagraphStyle(
+            name='Heading3',
+            parent=self.styles['Heading3'],
+            fontSize=13,
+            textColor=colors.HexColor('#0f172a'),
+            spaceAfter=10,
+            spaceBefore=15,
+            fontName='Helvetica-Bold'
+        ))
     
     def generate_report(self, cbam_summary, ets_forecast, report_text, 
                        emission_analysis=None, optimization_scenarios=None):
@@ -109,7 +122,7 @@ class CBAMPDFGenerator:
         story = []
         
         # Header
-        story.append(Paragraph("⚡ GreFins", self.styles['CustomSubtitle']))
+        story.append(Paragraph(" GreFins", self.styles['CustomSubtitle']))
         story.append(Spacer(1, 0.3*cm))
         
         # Title
@@ -122,7 +135,7 @@ class CBAMPDFGenerator:
         story.append(Spacer(1, 0.5*cm))
         
         # Executive Summary Box
-        story.append(Paragraph("📊 Executive Summary", self.styles['SectionHeader']))
+        story.append(Paragraph("Executive Summary", self.styles['SectionHeader']))
         
         summary_data = [
             ['Metric', 'Value'],
@@ -151,17 +164,48 @@ class CBAMPDFGenerator:
         story.append(summary_table)
         story.append(Spacer(1, 0.5*cm))
         
+        # --- CHARTS SECTION ---
+        story.append(Paragraph("Visual Analysis", self.styles['SectionHeader']))
+        
+        # 1. Cost Projection Chart
+        if ets_forecast is not None and not ets_forecast.empty:
+            cost_chart_img = self._create_cost_chart(ets_forecast)
+            if cost_chart_img:
+                story.append(Image(cost_chart_img, width=16*cm, height=8*cm))
+                story.append(Spacer(1, 0.5*cm))
+        
+        # 2. Emission Breakdown Chart (if data exists)
+        if emission_analysis:
+            emission_chart_img = self._create_emission_pie_chart(emission_analysis)
+            if emission_chart_img:
+                story.append(Image(emission_chart_img, width=16*cm, height=8*cm))
+                story.append(Spacer(1, 0.5*cm))
+
         # ETS Forecast Table
         if ets_forecast is not None and not ets_forecast.empty:
-            story.append(Paragraph("📈 ETS Price Forecast (6-Year Projection)", self.styles['SectionHeader']))
+            story.append(Paragraph(" ETS Price Forecast (6-Year Projection)", self.styles['SectionHeader']))
             
             forecast_data = [['Period', 'ETS Price (€/tCO2)', 'CBAM Cost (€)']]
+            # Try to determine column names dynamically to be robust
+            cols = ets_forecast.columns.tolist()
+            period_col = 'Quarter' if 'Quarter' in cols else ('period' if 'period' in cols else cols[0])
+            price_col = 'ETS_Price' if 'ETS_Price' in cols else ('ets_price' if 'ets_price' in cols else (cols[1] if len(cols) > 1 else cols[0]))
+            cost_col = 'CBAM_Cost' if 'CBAM_Cost' in cols else ('projected_cbam_cost' if 'projected_cbam_cost' in cols else (cols[2] if len(cols) > 2 else price_col))
+
             for _, row in ets_forecast.head(8).iterrows():
-                forecast_data.append([
-                    row['period'],
-                    f"€{row['ets_price']:,.2f}",
-                    f"€{row['projected_cbam_cost']:,.2f}"
-                ])
+                try:
+                    p_val = row[period_col] if period_col in row else "N/A"
+                    pr_val = row[price_col] if price_col in row else 0
+                    c_val = row[cost_col] if cost_col in row else 0
+                    
+                    forecast_data.append([
+                        p_val,
+                        f"€{pr_val:,.2f}" if isinstance(pr_val, (int, float)) else str(pr_val),
+                        f"€{c_val:,.2f}" if isinstance(c_val, (int, float)) else str(c_val)
+                    ])
+                except Exception as e:
+                    print(f"Row parsing error: {e}")
+                    continue
             
             forecast_table = Table(forecast_data, colWidths=[5*cm, 5*cm, 5*cm])
             forecast_table.setStyle(TableStyle([
@@ -182,7 +226,7 @@ class CBAMPDFGenerator:
         
         # Emission Analysis
         if emission_analysis:
-            story.append(Paragraph("🔬 Emission Analysis", self.styles['SectionHeader']))
+            story.append(Paragraph(" Emission Analysis", self.styles['SectionHeader']))
             
             if emission_analysis.get('scope1'):
                 scope1 = emission_analysis['scope1']
@@ -206,15 +250,28 @@ class CBAMPDFGenerator:
         
         # Optimization Scenarios
         if optimization_scenarios and len(optimization_scenarios) > 0:
-            story.append(Paragraph("💡 Optimization Scenarios", self.styles['SectionHeader']))
+            story.append(Paragraph(" Optimization Scenarios", self.styles['SectionHeader']))
             
             opt_data = [['Scenario', 'Annual Savings', 'Investment', 'ROI (years)']]
-            for scenario in optimization_scenarios:
+            # Handle both list and dict formats for optimization scenarios
+            scenarios_list = []
+            if isinstance(optimization_scenarios, dict):
+                scenarios_list = list(optimization_scenarios.values())
+            elif isinstance(optimization_scenarios, list):
+                scenarios_list = optimization_scenarios
+
+            for scenario in scenarios_list:
+                if not isinstance(scenario, dict): continue
+                
+                annual_savings = scenario.get('annual_cbam_saving_eur') or scenario.get('annual_savings') or 0
+                investment = scenario.get('investment_needed_eur') or scenario.get('investment_cost') or 0
+                roi = scenario.get('roi_years') or 0
+                
                 opt_data.append([
                     scenario.get('name', 'N/A'),
-                    f"€{scenario.get('annual_savings', 0):,.0f}",
-                    f"€{scenario.get('investment_cost', 0):,.0f}",
-                    f"{scenario.get('roi_years', 0):.1f}"
+                    f"€{annual_savings:,.0f}",
+                    f"€{investment:,.0f}",
+                    f"{roi:.1f}"
                 ])
             
             opt_table = Table(opt_data, colWidths=[6*cm, 3*cm, 3*cm, 3*cm])
@@ -237,25 +294,44 @@ class CBAMPDFGenerator:
         story.append(PageBreak())
         
         # Detailed AI Report
-        story.append(Paragraph("📋 Detailed Analysis Report", self.styles['SectionHeader']))
+        story.append(Paragraph(" Detailed Analysis Report", self.styles['SectionHeader']))
         story.append(HRFlowable(width="100%", thickness=1, color=colors.HexColor('#cbd5e1')))
         story.append(Spacer(1, 0.3*cm))
         
+        # Helper to clean markdown and convert to ReportLab tags
+        def md_to_rl(text):
+            import re
+            # Convert **bold** to <b>bold</b>
+            text = re.sub(r'\*\*(.*?)\*\*', r'<b>\1</b>', text)
+            # Convert *italic* to <i>italic</i>
+            text = re.sub(r'\*(.*?)\*', r'<i>\1</i>', text)
+            return text
+
         # Split report text into paragraphs
         if report_text:
             paragraphs = report_text.split('\n')
             for para in paragraphs:
-                if para.strip():
-                    # Check if it's a header (starts with ##)
-                    if para.strip().startswith('##'):
-                        header_text = para.strip().replace('##', '').strip()
-                        story.append(Paragraph(header_text, self.styles['SectionHeader']))
-                    elif para.strip().startswith('#'):
-                        header_text = para.strip().replace('#', '').strip()
-                        story.append(Paragraph(header_text, self.styles['Heading3']))
-                    else:
-                        # Regular paragraph
-                        story.append(Paragraph(para.strip(), self.styles['CustomBody']))
+                para = para.strip()
+                if not para:
+                    continue
+                
+                # Check for headers
+                if para.startswith('###'):
+                    header_text = md_to_rl(para.replace('###', '').strip())
+                    story.append(Paragraph(header_text, self.styles['Heading3']))
+                elif para.startswith('##'):
+                    header_text = md_to_rl(para.replace('##', '').strip())
+                    story.append(Paragraph(header_text, self.styles['SectionHeader']))
+                elif para.startswith('#'):
+                    header_text = md_to_rl(para.replace('#', '').strip())
+                    story.append(Paragraph(header_text, self.styles['CustomTitle']))
+                elif para.startswith('-') or para.startswith('*'):
+                    # Handle bullet points
+                    bullet_text = md_to_rl(para[1:].strip())
+                    story.append(Paragraph(f"• {bullet_text}", self.styles['CustomBody']))
+                else:
+                    # Regular paragraph
+                    story.append(Paragraph(md_to_rl(para), self.styles['CustomBody']))
         
         # Footer
         story.append(Spacer(1, 1*cm))
@@ -269,3 +345,95 @@ class CBAMPDFGenerator:
         doc.build(story)
         buffer.seek(0)
         return buffer
+
+    def _create_cost_chart(self, df):
+        """Create a professional CBAM cost projection chart"""
+        try:
+            # Set style for dark/professional theme
+            plt.style.use('dark_background')
+            fig, ax = plt.subplots(figsize=(10, 5), dpi=120)
+            fig.patch.set_facecolor('#0B1121')
+            ax.set_facecolor('#0B1121')
+            
+            # Colors
+            primary_color = '#C9FD02'
+            
+            # Determine column names
+            cols = df.columns.tolist()
+            period_col = 'Quarter' if 'Quarter' in cols else ('period' if 'period' in cols else cols[0])
+            cost_col = 'CBAM_Cost' if 'CBAM_Cost' in cols else ('projected_cbam_cost' if 'projected_cbam_cost' in cols else (cols[2] if len(cols) > 2 else cols[0]))
+            
+            # Get data for first 8 periods (2 years)
+            plot_df = df.head(8).copy()
+            
+            # Plot
+            bars = ax.bar(plot_df[period_col], plot_df[cost_col], color=primary_color, alpha=0.3, label='Maliyet (Bar)')
+            ax.plot(plot_df[period_col], plot_df[cost_col], color=primary_color, marker='o', linewidth=3, markersize=8, label='Trend')
+            
+            # Styling
+            ax.set_title('CBAM Maliyet Projeksiyonu (8 Çeyrek)', fontsize=16, fontweight='bold', color='white', pad=20)
+            ax.set_xlabel('Dönem', fontsize=10, color='#94A3B8')
+            ax.set_ylabel('Tahmini Maliyet (€)', fontsize=10, color='#94A3B8')
+            plt.xticks(rotation=45, color='#94A3B8')
+            plt.yticks(color='#94A3B8')
+            
+            # Hide spines
+            ax.spines['top'].set_visible(False)
+            ax.spines['right'].set_visible(False)
+            ax.spines['left'].set_color('#2D3748')
+            ax.spines['bottom'].set_color('#2D3748')
+            
+            ax.grid(axis='y', linestyle='--', alpha=0.1)
+            plt.tight_layout()
+            
+            img_buffer = io.BytesIO()
+            plt.savefig(img_buffer, format='png', facecolor=fig.get_facecolor(), edgecolor='none')
+            img_buffer.seek(0)
+            plt.close()
+            return img_buffer
+        except Exception as e:
+            print(f"Error creating cost chart: {e}")
+            return None
+
+    def _create_emission_pie_chart(self, emission_analysis):
+        """Create a professional emission breakdown pie chart"""
+        try:
+            labels = []
+            sizes = []
+            # Concept colors
+            colors_list = ['#C9FD02', '#10B981', '#3B82F6', '#6366F1']
+            
+            if emission_analysis.get('scope1') and emission_analysis['scope1'].get('total_scope1', 0) > 0:
+                labels.append('Scope 1')
+                sizes.append(emission_analysis['scope1']['total_scope1'])
+                
+            if emission_analysis.get('scope2') and emission_analysis['scope2'].get('total_scope2', 0) > 0:
+                labels.append('Scope 2')
+                sizes.append(emission_analysis['scope2']['total_scope2'])
+            
+            if not sizes:
+                return None
+                
+            plt.style.use('dark_background')
+            fig, ax = plt.subplots(figsize=(8, 5), dpi=120)
+            fig.patch.set_facecolor('#0B1121')
+            
+            wedges, texts, autotexts = ax.pie(
+                sizes, labels=labels, autopct='%1.1f%%', startangle=140, 
+                colors=colors_list[:len(sizes)], 
+                wedgeprops={'edgecolor': '#151E32', 'linewidth': 2, 'antialiased': True},
+                textprops={'color': 'white', 'fontweight': 'bold'}
+            )
+            
+            ax.set_title('Karbon Emisyon Profili (Scope 1 & 2)', fontsize=16, fontweight='bold', color='white', pad=20)
+            plt.axis('equal')
+            plt.tight_layout()
+            
+            img_buffer = io.BytesIO()
+            plt.savefig(img_buffer, format='png', facecolor=fig.get_facecolor(), edgecolor='none')
+            img_buffer.seek(0)
+            plt.close()
+            return img_buffer
+        except Exception as e:
+            print(f"Error creating emission chart: {e}")
+            return None
