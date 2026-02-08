@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CBAM Sonuçlar</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>✅ CBAM Hesaplama Sonucu</h1>
+
+        <div class="result-grid">
+            <div class="result-card">
+                <h3>Toplam Emisyon</h3>
+                <div class="value">{{ "{:,.2f}".format(summary.total_emission) }} tCO2e</div>
+            </div>
+            <div class="result-card">
+                <h3>Gerekli Sertifika</h3>
+                <div class="value">{{ "{:,.2f}".format(summary.certificates) }}</div>
+            </div>
+            <div class="result-card">
+                <h3>CBAM Maliyeti</h3>
+                <div class="value">€{{ "{:,.2f}".format(summary.cbam_cost) }}</div>
+            </div>
+        </div>
+
+        <div class="info-section">
+            <h2>📦 Ürün Bilgileri</h2>
+            <div class="info-row">
+                <span>Ürün:</span>
+                <span>{{ summary.product }}</span>
+            </div>
+            <div class="info-row">
+                <span>Kategori:</span>
+                <span>{{ summary.category }}</span>
+            </div>
+            <div class="info-row">
+                <span>Miktar:</span>
+                <span>{{ "{:,.0f}".format(summary.quantity_tonnes) }} ton</span>
+            </div>
+        </div>
+
+        <div class="info-section">
+            <h2>🌡️ Emisyon Detayları</h2>
+            <div class="info-row">
+                <span>Direkt EI:</span>
+                <span>{{ summary.direct_ei }} tCO2/ton</span>
+            </div>
+            <div class="info-row">
+                <span>İndirekt EI:</span>
+                <span>{{ summary.indirect_ei }} tCO2/ton</span>
+            </div>
+            <div class="info-row">
+                <span>Toplam EI:</span>
+                <span><strong>{{ summary.total_ei }} tCO2/ton</strong></span>
+            </div>
+        </div>
+
+        <a href="/" class="back-button">⬅️ Yeni Hesaplama</a>
+    </div>
+</body>
+</html>

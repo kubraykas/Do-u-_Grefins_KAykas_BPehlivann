@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CBAM Tam Analiz Sonuçları</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        .analysis-section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .metric-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .metric-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .metric-value {
+            font-size: 24px;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        .metric-label {
+            font-size: 12px;
+            opacity: 0.9;
+        }
+        .forecast-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+        .forecast-table th,
+        .forecast-table td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        .forecast-table th {
+            background: #667eea;
+            color: white;
+        }
+        .forecast-table tr:hover {
+            background: #f5f5f5;
+        }
+        .risk-high { color: #e74c3c; font-weight: bold; }
+        .risk-medium { color: #f39c12; font-weight: bold; }
+        .risk-low { color: #27ae60; font-weight: bold; }
+        .report-section {
+            background: #f9f9f9;
+            padding: 20px;
+            border-left: 4px solid #667eea;
+            margin: 20px 0;
+            white-space: pre-wrap;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📊 CBAM Tam Analiz Raporu</h1>
+        <p class="subtitle">4 Adımlı Kapsamlı Analiz: Hesaplama → ETS Tahmin → Maliyet Projeksiyonu → Yönetici Raporu</p>
+
+        <!-- İşlem Adımları -->
+        <div class="analysis-section" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+            <h2>✓ Tamamlanan Adımlar</h2>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-top: 15px;">
+                <div style="text-align: center; padding: 10px; background: rgba(255,255,255,0.2); border-radius: 8px;">
+                    <div style="font-size: 24px;">1️⃣</div>
+                    <div>CBAM Hesaplama</div>
+                </div>
+                <div style="text-align: center; padding: 10px; background: rgba(255,255,255,0.2); border-radius: 8px;">
+                    <div style="font-size: 24px;">2️⃣</div>
+                    <div>ETS Fiyat Tahmini</div>
+                </div>
+                <div style="text-align: center; padding: 10px; background: rgba(255,255,255,0.2); border-radius: 8px;">
+                    <div style="font-size: 24px;">3️⃣</div>
+                    <div>Maliyet Projeksiyonu</div>
+                </div>
+                <div style="text-align: center; padding: 10px; background: rgba(255,255,255,0.2); border-radius: 8px;">
+                    <div style="font-size: 24px;">4️⃣</div>
+                    <div>Yönetici Raporu</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ADIM 1: CBAM Hesaplama Özeti -->
+        <div class="analysis-section">
+            <h2>ADIM 1: CBAM Hesaplama Özeti</h2>
+            <p style="color: #666; margin-bottom: 15px;">Temel formüller: Toplam EI = Direkt + İndirekt | Emisyon = Miktar × Toplam EI | Maliyet = Emisyon × ETS Fiyat</p>
+            <div class="metric-grid">
+                <div class="metric-card">
+                    <div class="metric-label">Ürün</div>
+                    <div class="metric-value" style="font-size: 16px;">{{ cbam_summary.product }}</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Miktar</div>
+                    <div class="metric-value">{{ "{:,.0f}".format(cbam_summary.quantity_tonnes) }} ton</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Toplam Emisyon</div>
+                    <div class="metric-value">{{ "{:,.1f}".format(cbam_summary.total_emission) }} tCO2</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">CBAM Maliyeti</div>
+                    <div class="metric-value">€{{ "{:,.2f}".format(cbam_summary.cbam_cost) }}</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ADIM 2: ETS İstatistikler -->
+        <div class="analysis-section">
+            <h2>ADIM 2: ETS Fiyat Analizi ve Tahminleri</h2>
+            <p style="color: #666; margin-bottom: 15px;">Gemini LLM ile 2019-2025 ICAP verileri analiz edildi, 2025-2030 tahminleri oluşturuldu</p>
+            
+            <h3 style="margin-top: 20px;">Geçmiş Veri İstatistikleri (2019-2025)</h3>
+            <div class="metric-grid">
+                <div class="metric-card">
+                    <div class="metric-label">Son Fiyat</div>
+                    <div class="metric-value">€{{ "{:.2f}".format(ets_stats.last_price) }}</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Ortalama</div>
+                    <div class="metric-value">€{{ "{:.2f}".format(ets_stats.mean_price) }}</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Volatilite</div>
+                    <div class="metric-value">€{{ "{:.2f}".format(ets_stats.std_dev) }}</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Trend</div>
+                    <div class="metric-value" style="font-size: 16px;">{{ ets_stats.trend }}</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ETS Tahminler -->
+        <div class="analysis-section">
+            <h3>Gelecek Fiyat Tahminleri (Q1 2025 - Q4 2027)</h3>
+            <p style="color: #666; font-size: 14px;">AI destekli çeyreklik ETS karbon fiyat projeksiyonları</p>
+            <table class="forecast-table">
+                <thead>
+                    <tr>
+                        <th>Çeyrek</th>
+                        <th>Tahmin Edilen Fiyat</th>
+                        <th>Değişim</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in ets_forecast %}
+                    <tr>
+                        <td>{{ row.Quarter }}</td>
+                        <td>€{{ "{:.2f}".format(row['Forecasted Value']) }}</td>
+                        <td>
+                            {% if loop.index > 1 %}
+                                {% set change = ((row['Forecasted Value'] - ets_forecast[loop.index-2]['Forecasted Value']) / ets_forecast[loop.index-2]['Forecasted Value'] * 100) %}
+                                {% if change > 0 %}
+                                    <span style="color: #e74c3c;">▲ {{ "{:.1f}".format(change) }}%</span>
+                                {% else %}
+                                    <span style="color: #27ae60;">▼ {{ "{:.1f}".format(change|abs) }}%</span>
+                                {% endif %}
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- ADIM 3: CBAM Maliyet Projeksiyonu -->
+        <div class="analysis-section">
+            <h2>ADIM 3: CBAM Maliyet Projeksiyonu ve Risk Analizi</h2>
+            <p style="color: #666; margin-bottom: 15px;">ETS tahminlerine göre gelecek CBAM maliyetleri ve risk seviyeleri</p>
+            <table class="forecast-table">
+                <thead>
+                    <tr>
+                        <th>Çeyrek</th>
+                        <th>ETS Fiyat</th>
+                        <th>CBAM Maliyet</th>
+                        <th>Risk Seviyesi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in cbam_df %}
+                    <tr>
+                        <td>{{ row.Quarter }}</td>
+                        <td>€{{ "{:.2f}".format(row.ETS_Price) }}</td>
+                        <td>€{{ "{:,.2f}".format(row.CBAM_Cost) }}</td>
+                        <td>
+                            {% if row.Risk_Level == 'Yüksek' %}
+                                <span class="risk-high">⚠️ {{ row.Risk_Level }}</span>
+                            {% elif row.Risk_Level == 'Orta' %}
+                                <span class="risk-medium">⚡ {{ row.Risk_Level }}</span>
+                            {% else %}
+                                <span class="risk-low">✓ {{ row.Risk_Level }}</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- ADIM 4: Yönetici Raporu -->
+        <div class="analysis-section">
+            <h2>ADIM 4: Yönetici Özeti ve Stratejik Öneriler</h2>
+            <p style="color: #666; margin-bottom: 15px;">Gemini LLM tarafından oluşturulan kapsamlı analiz ve öneriler</p>
+            <div class="report-section">{{ report.report_text }}</div>
+        </div>
+
+        <!-- Finansal Etki Özeti -->
+        <div class="analysis-section">
+            <h2>💰 Finansal Etki Analizi - Özet Metrikler</h2>
+            <p style="color: #666; margin-bottom: 15px;">6 yıllık (2025-2030) toplam finansal etki projeksiyonu</p>
+            <div class="metric-grid">
+                <div class="metric-card">
+                    <div class="metric-label">Ortalama Yıllık Maliyet</div>
+                    <div class="metric-value">€{{ "{:,.0f}".format(report.metrics.avg_annual_cost) }}</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">6 Yıllık Toplam</div>
+                    <div class="metric-value">€{{ "{:,.0f}".format(report.metrics.total_6year_cost) }}</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Maksimum Çeyreklik</div>
+                    <div class="metric-value">€{{ "{:,.0f}".format(report.metrics.max_quarterly_cost) }}</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Yüksek Risk Dönemleri</div>
+                    <div class="metric-value">{{ report.metrics.high_risk_periods }}</div>
+                </div>
+            </div>
+        </div>
+
+        <div style="text-align: center; margin: 30px 0;">
+            <a href="/" class="link-button">🔙 Yeni Analiz</a>
+            <a href="/cn-codes" class="link-button">📚 CN Kodları</a>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CN Kodları</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>📚 CN Kodları ({{ codes|length }} Ürün)</h1>
+        
+        <input type="text" class="search-box" id="searchBox" placeholder="🔍 Ara...">
+
+        <table>
+            <thead>
+                <tr>
+                    <th>CN Kodu</th>
+                    <th>Açıklama</th>
+                    <th>Kategori</th>
+                    <th>EI (tCO2/t)</th>
+                </tr>
+            </thead>
+            <tbody id="codesTable">
+                {% for code in codes %}
+                <tr>
+                    <td><strong>{{ code.code }}</strong></td>
+                    <td>{{ code.description }}</td>
+                    <td>{{ code.category }}</td>
+                    <td>{{ code.total_ei }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <a href="/" class="back-button">⬅️ Ana Sayfa</a>
+    </div>
+
+    <script>
+        document.getElementById('searchBox').addEventListener('keyup', function() {
+            const term = this.value.toLowerCase();
+            document.querySelectorAll('#codesTable tr').forEach(row => {
+                row.style.display = row.textContent.toLowerCase().includes(term) ? '' : 'none';
+            });
+        });
+    </script>
+</body>
+</html>
