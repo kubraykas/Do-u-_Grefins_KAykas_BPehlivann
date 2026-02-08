@@ -3,61 +3,115 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CBAM Tam Analiz Sonuçları</title>
+    <title>GreFins CBAM Detaylı Analiz Raporu</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <style>
+        .download-section {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: var(--shadow);
+        }
+        .download-info h3 {
+            color: var(--text-dark);
+            margin-bottom: 0.5rem;
+        }
+        .download-info p {
+            color: var(--text-gray);
+            font-size: 0.9rem;
+        }
+        .download-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.875rem 1.5rem;
+            background: var(--primary);
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: 600;
+            transition: background 0.2s;
+        }
+        .download-btn:hover {
+            background: var(--primary-dark);
+        }
         .analysis-section {
             background: white;
-            padding: 20px;
-            margin: 20px 0;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 2rem;
+            margin: 2rem 0;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow);
         }
         .metric-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            margin: 20px 0;
+            gap: 1rem;
+            margin: 1.5rem 0;
         }
         .metric-card {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 15px;
-            border-radius: 8px;
+            background: var(--bg-light);
+            border: 1px solid var(--border);
+            padding: 1.5rem;
+            border-radius: 6px;
             text-align: center;
         }
         .metric-value {
-            font-size: 24px;
-            font-weight: bold;
-            margin: 10px 0;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin: 0.5rem 0;
         }
         .metric-label {
-            font-size: 12px;
-            opacity: 0.9;
+            font-size: 0.875rem;
+            color: var(--text-gray);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
-        .forecast-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 15px 0;
+        .step-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
         }
-        .forecast-table th,
-        .forecast-table td {
-            padding: 10px;
-            text-align: left;
-            border-bottom: 1px solid #ddd;
+        .step-card {
+            text-align: center;
+            padding: 1rem;
+            background: var(--bg-light);
+            border-radius: 6px;
+            border: 1px solid var(--border);
         }
-        .forecast-table th {
-            background: #667eea;
-            color: white;
+        .step-number {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
         }
-        .forecast-table tr:hover {
-            background: #f5f5f5;
+        .report-text {
+            background: var(--bg-white);
+            padding: 1.5rem;
+            border-left: 3px solid var(--primary);
+            margin: 1rem 0;
+            white-space: pre-wrap;
+            font-family: 'Courier New', monospace;
+            font-size: 0.875rem;
+            line-height: 1.6;
+            color: var(--text-dark);
         }
-        .risk-high { color: #e74c3c; font-weight: bold; }
-        .risk-medium { color: #f39c12; font-weight: bold; }
-        .risk-low { color: #27ae60; font-weight: bold; }
-        .report-section {
-            background: #f9f9f9;
+        .risk-high { color: #dc3545; font-weight: 600; }
+        .risk-medium { color: #ffc107; font-weight: 600; }
+        .risk-low { color: #28a745; font-weight: 600; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="page-header">
+            <h1>CBAM Tam Analiz Raporu</h1>
+            <p class="subtitle">4 Adımlı Kapsamlı Analiz: Hesaplama → ETS Tahmin → Maliyet Projeksiyonu → Yönetici Raporu</p>
+        </div>
             padding: 20px;
             border-left: 4px solid #667eea;
             margin: 20px 0;
@@ -73,24 +127,36 @@
         <h1>📊 CBAM Tam Analiz Raporu</h1>
         <p class="subtitle">4 Adımlı Kapsamlı Analiz: Hesaplama → ETS Tahmin → Maliyet Projeksiyonu → Yönetici Raporu</p>
 
+        <!-- PDF İndirme Bölümü -->
+        <div class="download-section">
+            <div class="download-info">
+                <h3>Profesyonel Rapor</h3>
+                <p>ETS tahminleri, emisyon analizi ve optimizasyon senaryolarını içeren tam rapor</p>
+            </div>
+            <a href="/download-pdf" class="download-btn">
+                <span>📥</span>
+                <span>PDF İndir</span>
+            </a>
+        </div>
+
         <!-- İşlem Adımları -->
-        <div class="analysis-section" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+        <div class="analysis-section">
             <h2>✓ Tamamlanan Adımlar</h2>
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-top: 15px;">
-                <div style="text-align: center; padding: 10px; background: rgba(255,255,255,0.2); border-radius: 8px;">
-                    <div style="font-size: 24px;">1️⃣</div>
+            <div class="step-grid">
+                <div class="step-card">
+                    <div class="step-number">1️⃣</div>
                     <div>CBAM Hesaplama</div>
                 </div>
-                <div style="text-align: center; padding: 10px; background: rgba(255,255,255,0.2); border-radius: 8px;">
-                    <div style="font-size: 24px;">2️⃣</div>
+                <div class="step-card">
+                    <div class="step-number">2️⃣</div>
                     <div>ETS Fiyat Tahmini</div>
                 </div>
-                <div style="text-align: center; padding: 10px; background: rgba(255,255,255,0.2); border-radius: 8px;">
-                    <div style="font-size: 24px;">3️⃣</div>
+                <div class="step-card">
+                    <div class="step-number">3️⃣</div>
                     <div>Maliyet Projeksiyonu</div>
                 </div>
-                <div style="text-align: center; padding: 10px; background: rgba(255,255,255,0.2); border-radius: 8px;">
-                    <div style="font-size: 24px;">4️⃣</div>
+                <div class="step-card">
+                    <div class="step-number">4️⃣</div>
                     <div>Yönetici Raporu</div>
                 </div>
             </div>
@@ -99,7 +165,7 @@
         <!-- ADIM 1: CBAM Hesaplama Özeti -->
         <div class="analysis-section">
             <h2>ADIM 1: CBAM Hesaplama Özeti</h2>
-            <p style="color: #666; margin-bottom: 15px;">Temel formüller: Toplam EI = Direkt + İndirekt | Emisyon = Miktar × Toplam EI | Maliyet = Emisyon × ETS Fiyat</p>
+            <p style="color: var(--text-gray); margin-bottom: 1rem;">Temel formüller: Toplam EI = Direkt + İndirekt | Emisyon = Miktar × Toplam EI | Maliyet = Emisyon × ETS Fiyat</p>
             <div class="metric-grid">
                 <div class="metric-card">
                     <div class="metric-label">Ürün</div>
@@ -123,7 +189,7 @@
         <!-- ADIM 2: ETS İstatistikler -->
         <div class="analysis-section">
             <h2>ADIM 2: ETS Fiyat Analizi ve Tahminleri</h2>
-            <p style="color: #666; margin-bottom: 15px;">Gemini LLM ile 2019-2025 ICAP verileri analiz edildi, 2025-2030 tahminleri oluşturuldu</p>
+            <p style="color: var(--text-gray); margin-bottom: 1rem;">Gemini AI ile 2019-2025 ICAP verileri analiz edildi, 2025-2030 tahminleri oluşturuldu</p>
             
             <h3 style="margin-top: 20px;">Geçmiş Veri İstatistikleri (2019-2025)</h3>
             <div class="metric-grid">
@@ -149,8 +215,8 @@
         <!-- ETS Tahminler -->
         <div class="analysis-section">
             <h3>Gelecek Fiyat Tahminleri (Q1 2025 - Q4 2027)</h3>
-            <p style="color: #666; font-size: 14px;">AI destekli çeyreklik ETS karbon fiyat projeksiyonları</p>
-            <table class="forecast-table">
+            <p style="color: var(--text-gray); font-size: 0.875rem; margin-bottom: 1rem;">AI destekli çeyreklik ETS karbon fiyat projeksiyonları</p>
+            <table>
                 <thead>
                     <tr>
                         <th>Çeyrek</th>
@@ -167,9 +233,9 @@
                             {% if loop.index > 1 %}
                                 {% set change = ((row['Forecasted Value'] - ets_forecast[loop.index-2]['Forecasted Value']) / ets_forecast[loop.index-2]['Forecasted Value'] * 100) %}
                                 {% if change > 0 %}
-                                    <span style="color: #e74c3c;">▲ {{ "{:.1f}".format(change) }}%</span>
+                                    <span style="color: #dc3545;">▲ {{ "{:.1f}".format(change) }}%</span>
                                 {% else %}
-                                    <span style="color: #27ae60;">▼ {{ "{:.1f}".format(change|abs) }}%</span>
+                                    <span style="color: #28a745;">▼ {{ "{:.1f}".format(change|abs) }}%</span>
                                 {% endif %}
                             {% else %}
                                 -
@@ -184,8 +250,8 @@
         <!-- ADIM 3: CBAM Maliyet Projeksiyonu -->
         <div class="analysis-section">
             <h2>ADIM 3: CBAM Maliyet Projeksiyonu ve Risk Analizi</h2>
-            <p style="color: #666; margin-bottom: 15px;">ETS tahminlerine göre gelecek CBAM maliyetleri ve risk seviyeleri</p>
-            <table class="forecast-table">
+            <p style="color: var(--text-gray); margin-bottom: 1rem;">ETS tahminlerine göre gelecek CBAM maliyetleri ve risk seviyeleri</p>
+            <table>
                 <thead>
                     <tr>
                         <th>Çeyrek</th>
@@ -215,34 +281,221 @@
             </table>
         </div>
 
+        <!-- YENİ: Emisyon Profili Analizi -->
+        {% if emission_analysis %}
+        <div class="analysis-section" style="border-left: 3px solid var(--primary);">
+            <h2>🏭 Emisyon Profili Analizi (Scope 1 & 2)</h2>
+            <p style="color: var(--text-gray); margin-bottom: 1rem;">Detaylı emisyon kaynakları ve dağılım analizi</p>
+            
+            {% if emission_analysis.scope1 %}
+            <h3 style="color: var(--text-dark);">🔥 Scope 1 - Doğrudan Emisyonlar</h3>
+            <div class="metric-grid">
+                <div class="metric-card">
+                    <div class="metric-label">Toplam Scope 1</div>
+                    <div class="metric-value">{{ "{:,.2f}".format(emission_analysis.scope1.total_scope1) }} tCO2</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Yakıt Bazlı</div>
+                    <div class="metric-value">{{ "{:,.2f}".format(emission_analysis.scope1.total_fuel) }} tCO2</div>
+                    <div class="metric-label">{{ "{:.1f}".format(emission_analysis.scope1.breakdown_percent.fuel) }}%</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Proses Bazlı</div>
+                    <div class="metric-value">{{ "{:,.2f}".format(emission_analysis.scope1.total_process) }} tCO2</div>
+                    <div class="metric-label">{{ "{:.1f}".format(emission_analysis.scope1.breakdown_percent.process) }}%</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Termal Sistemler</div>
+                    <div class="metric-value">{{ "{:,.2f}".format(emission_analysis.scope1.total_thermal) }} tCO2</div>
+                    <div class="metric-label">{{ "{:.1f}".format(emission_analysis.scope1.breakdown_percent.thermal) }}%</div>
+                </div>
+            </div>
+            
+            <details open style="margin-top: 1rem; padding: 1rem; background: var(--bg-light); border-radius: 6px; border: 1px solid var(--border);">
+                <summary style="cursor: pointer; font-weight: 600; color: var(--text-dark);">📋 Detaylı Yakıt Dağılımı</summary>
+                <table style="margin-top: 1rem;">
+                    <tr>
+                        <td>🪨 Kok Kömürü</td>
+                        <td><strong>{{ "{:,.2f}".format(emission_analysis.scope1.fuel_emissions.coking_coal) }} tCO2</strong></td>
+                    </tr>
+                    <tr>
+                        <td>🔥 Doğalgaz</td>
+                        <td><strong>{{ "{:,.2f}".format(emission_analysis.scope1.fuel_emissions.natural_gas) }} tCO2</strong></td>
+                    </tr>
+                    <tr>
+                        <td>🛢️ Fuel Oil</td>
+                        <td><strong>{{ "{:,.2f}".format(emission_analysis.scope1.fuel_emissions.fuel_oil) }} tCO2</strong></td>
+                    </tr>
+                    <tr style="background: #ffe6cc;">
+                        <td>⚪ Kireçtaşı (Proses)</td>
+                        <td><strong>{{ "{:,.2f}".format(emission_analysis.scope1.process_emissions.limestone) }} tCO2</strong></td>
+                    </tr>
+                </table>
+            </details>
+            
+            <div style="margin-top: 1rem; padding: 1rem; background: var(--bg-light); border-radius: 6px; border: 1px solid var(--border);">
+                <strong>Emisyon Yoğunluğu:</strong> {{ "{:.3f}".format(emission_analysis.scope1.emission_intensity) }} tCO2/ton çelik
+            </div>
+            {% endif %}
+            
+            {% if emission_analysis.scope2 %}
+            <h3 style="color: var(--text-dark); margin-top: 2rem;">⚡ Scope 2 - Dolaylı Emisyonlar (Elektrik)</h3>
+            <div class="metric-grid">
+                <div class="metric-card">
+                    <div class="metric-label">Toplam Scope 2</div>
+                    <div class="metric-value">{{ "{:,.2f}".format(emission_analysis.scope2.total_scope2) }} tCO2</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Grid Elektrik</div>
+                    <div class="metric-value">{{ "{:,.2f}".format(emission_analysis.scope2.grid_emissions) }} tCO2</div>
+                    <div class="metric-label">{{ "{:.1f}".format(emission_analysis.scope2.grid_share_percent) }}%</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Yenilenebilir</div>
+                    <div class="metric-value">{{ "{:.2f}".format(emission_analysis.scope2.renewable_emissions) }} tCO2</div>
+                    <div class="metric-label">{{ "{:.1f}".format(emission_analysis.scope2.renewable_percent) }}%</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Toplam Tüketim</div>
+                    <div class="metric-value">{{ "{:,.0f}".format(emission_analysis.scope2.consumption_mwh) }} MWh</div>
+                </div>
+            </div>
+            {% endif %}
+            
+            <div style="margin-top: 1.5rem; padding: 1.5rem; background: var(--primary); color: white; border-radius: 8px;">
+                <h3 style="color: white;">🎯 Toplam Emisyon (Scope 1 + 2)</h3>
+                <div style="font-size: 2rem; font-weight: 700; text-align: center; margin: 1rem 0;">
+                    {{ "{:,.2f}".format(emission_analysis.total_emissions) }} tCO2
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1rem;">
+                    <div style="text-align: center; padding: 1rem; background: rgba(255,255,255,0.2); border-radius: 6px;">
+                        <div style="font-size: 0.875rem;">Scope 1 Payı</div>
+                        <div style="font-size: 1.5rem; font-weight: 700;">{{ "{:.1f}".format(emission_analysis.breakdown_percent.scope1) }}%</div>
+                    </div>
+                    <div style="text-align: center; padding: 1rem; background: rgba(255,255,255,0.2); border-radius: 6px;">
+                        <div style="font-size: 0.875rem;">Scope 2 Payı</div>
+                        <div style="font-size: 1.5rem; font-weight: 700;">{{ "{:.1f}".format(emission_analysis.breakdown_percent.scope2) }}%</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- YENİ: Optimizasyon Senaryoları -->
+        {% if optimization_scenarios %}
+        <div class="analysis-section" style="border-left: 3px solid var(--primary);">
+            <h2>💡 Optimizasyon Fırsatları ve Maliyet Tasarruf Senaryoları</h2>
+            <p style="color: var(--text-gray); margin-bottom: 1rem;">Emisyon azaltım senaryoları, yatırım gereksinimleri ve ROI analizi</p>
+            
+            {% for key, scenario in optimization_scenarios.items() %}
+            {% if key != 'combined' %}
+            <div style="background: white; padding: 1.5rem; margin: 1rem 0; border-radius: 8px; border: 1px solid var(--border); box-shadow: var(--shadow);">
+                <h3 style="color: var(--text-dark);">{{ scenario.name }}</h3>
+                
+                <div class="metric-grid" style="margin-top: 1rem;">
+                    <div class="metric-card">
+                        <div class="metric-label">Emisyon Tasarrufu</div>
+                        <div class="metric-value" style="font-size: 1.25rem;">{{ "{:,.2f}".format(scenario.emission_saving_tco2) }} tCO2/yıl</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-label">CBAM Tasarrufu</div>
+                        <div class="metric-value" style="font-size: 1.25rem;">€{{ "{:,.0f}".format(scenario.annual_cbam_saving_eur) }}/yıl</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-label">Gereken Yatırım</div>
+                        <div class="metric-value" style="font-size: 1.25rem;">€{{ "{:,.0f}".format(scenario.investment_needed_eur) }}</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-label">Geri Ödeme Süresi</div>
+                        <div class="metric-value" style="font-size: 1.25rem;">{{ "{:.1f}".format(scenario.roi_years) }} yıl</div>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 1rem; padding: 1rem; background: var(--bg-light); border-radius: 6px; border: 1px solid var(--border);">
+                    <strong>🎯 Önerilen Önlemler:</strong>
+                    <ul style="margin: 0.5rem 0; padding-left: 1.25rem;">
+                        {% for measure in scenario.measures %}
+                        <li>{{ measure }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+            {% endif %}
+            {% endfor %}
+            
+            <!-- Kombine Senaryo -->
+            {% if optimization_scenarios.combined %}
+            {% set combined = optimization_scenarios.combined %}
+            <div style="background: var(--primary); color: white; padding: 2rem; margin: 1.5rem 0; border-radius: 8px; box-shadow: var(--shadow-md);">
+                <h3 style="color: white; font-size: 1.5rem;">🚀 {{ combined.name }}</h3>
+                <p style="opacity: 0.9; margin-top: 0.5rem;">Tüm optimizasyon önlemlerinin birlikte uygulanması</p>
+                
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-top: 20px;">
+                    <div style="text-align: center; padding: 20px; background: rgba(255,255,255,0.2); border-radius: 10px;">
+                        <div style="font-size: 14px; opacity: 0.9;">Toplam Emisyon Azaltımı</div>
+                        <div style="font-size: 28px; font-weight: bold; margin: 10px 0;">{{ "{:,.0f}".format(combined.total_emission_saving_tco2) }} tCO2/yıl</div>
+                        <div style="font-size: 18px; opacity: 0.9;">{{ "{:.1f}".format(combined.emission_reduction_percent) }}% azalma</div>
+                    </div>
+                    <div style="text-align: center; padding: 20px; background: rgba(255,255,255,0.2); border-radius: 10px;">
+                        <div style="font-size: 14px; opacity: 0.9;">Toplam CBAM Tasarrufu</div>
+                        <div style="font-size: 28px; font-weight: bold; margin: 10px 0;">€{{ "{:,.0f}".format(combined.total_annual_cbam_saving_eur) }}/yıl</div>
+                        <div style="font-size: 14px; opacity: 0.9;">6 yılda €{{ "{:,.0f}".format(combined.total_annual_cbam_saving_eur * 6) }}</div>
+                    </div>
+                    <div style="text-align: center; padding: 20px; background: rgba(255,255,255,0.2); border-radius: 10px;">
+                        <div style="font-size: 14px; opacity: 0.9;">Toplam Yatırım</div>
+                        <div style="font-size: 28px; font-weight: bold; margin: 10px 0;">€{{ "{:,.0f}".format(combined.total_investment_needed_eur) }}</div>
+                        <div style="font-size: 14px; opacity: 0.9;">Tek seferlik</div>
+                    </div>
+                    <div style="text-align: center; padding: 20px; background: rgba(255,255,255,0.2); border-radius: 10px;">
+                        <div style="font-size: 14px; opacity: 0.9;">Kombine ROI</div>
+                        <div style="font-size: 28px; font-weight: bold; margin: 10px 0;">{{ "{:.1f}".format(combined.roi_years) }} yıl</div>
+                        <div style="font-size: 14px; opacity: 0.9;">Geri ödeme süresi</div>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 20px; padding: 15px; background: rgba(255,255,255,0.15); border-radius: 8px; text-align: center;">
+                    <strong>💰 Net Kazanç (6 yıl):</strong> 
+                    <span style="font-size: 24px; font-weight: bold;">
+                        €{{ "{:,.0f}".format(combined.total_annual_cbam_saving_eur * 6 - combined.total_investment_needed_eur) }}
+                    </span>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        {% endif %}
+
         <!-- ADIM 4: Yönetici Raporu -->
         <div class="analysis-section">
             <h2>ADIM 4: Yönetici Özeti ve Stratejik Öneriler</h2>
-            <p style="color: #666; margin-bottom: 15px;">Gemini LLM tarafından oluşturulan kapsamlı analiz ve öneriler</p>
-            <div class="report-section">{{ report.report_text }}</div>
+            <p style="color: var(--text-gray); margin-bottom: 1rem;">Gemini AI tarafından oluşturulan kapsamlı analiz ve öneriler</p>
+            <div class="report-text">{{ report.report_text }}</div>
         </div>
 
         <!-- Finansal Etki Özeti -->
         <div class="analysis-section">
             <h2>💰 Finansal Etki Analizi - Özet Metrikler</h2>
-            <p style="color: #666; margin-bottom: 15px;">6 yıllık (2025-2030) toplam finansal etki projeksiyonu</p>
+            <p style="color: var(--text-gray); margin-bottom: 1rem;">6 yıllık (2025-2030) toplam finansal etki projeksiyonu</p>
             <div class="metric-grid">
                 <div class="metric-card">
-                    <div class="metric-label">Ortalama Yıllık Maliyet</div>
-                    <div class="metric-value">€{{ "{:,.0f}".format(report.metrics.avg_annual_cost) }}</div>
+                    <div class="metric-label">Mevcut CBAM Maliyeti</div>
+                    <div class="metric-value">€{{ "{:,.0f}".format(cbam_summary.cbam_cost) }}</div>
                 </div>
                 <div class="metric-card">
-                    <div class="metric-label">6 Yıllık Toplam</div>
-                    <div class="metric-value">€{{ "{:,.0f}".format(report.metrics.total_6year_cost) }}</div>
+                    <div class="metric-label">6 Yıllık Toplam (Projeksiyon)</div>
+                    <div class="metric-value">€{{ "{:,.0f}".format(report.metrics.total_cbam_cost) }}</div>
                 </div>
                 <div class="metric-card">
-                    <div class="metric-label">Maksimum Çeyreklik</div>
-                    <div class="metric-value">€{{ "{:,.0f}".format(report.metrics.max_quarterly_cost) }}</div>
+                    <div class="metric-label">En Yüksek Maliyet Dönemi</div>
+                    <div class="metric-value" style="font-size: 16px;">{{ report.metrics.critical_quarter }}</div>
+                    <div class="metric-label">€{{ "{:,.0f}".format(report.metrics.critical_cost) }}</div>
                 </div>
+                {% if optimization_scenarios and optimization_scenarios.combined %}
                 <div class="metric-card">
-                    <div class="metric-label">Yüksek Risk Dönemleri</div>
-                    <div class="metric-value">{{ report.metrics.high_risk_periods }}</div>
+                    <div class="metric-label">Optimizasyon Sonrası Tasarruf</div>
+                    <div class="metric-value">€{{ "{:,.0f}".format(optimization_scenarios.combined.total_annual_cbam_saving_eur * 6) }}</div>
+                    <div class="metric-label">6 yıllık toplam</div>
                 </div>
+                {% endif %}
             </div>
         </div>
 

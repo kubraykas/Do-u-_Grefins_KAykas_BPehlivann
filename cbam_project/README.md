@@ -39,6 +39,14 @@ Profesyonel modüler AB CBAM (Carbon Border Adjustment Mechanism) hesaplama, ETS
 -  **Maliyet analizi** - ETS fiyatına göre anlık hesaplama
 -  **CN kod doğrulama** - Otomatik kod kontrolü
 
+###  Emisyon Analizi (Yeni!)
+-  **Scope 1 Emisyonlar** - Doğrudan emisyonlar (yakıt yanması, proses, termal enerji)
+-  **Scope 2 Emisyonlar** - Dolaylı emisyonlar (elektrik tüketimi, yenilenebilir enerji payı)
+-  **15+ veri girişi** - Kok kömürü, doğalgaz, elektrik tüketimi, proses emisyonları vb.
+-  **Otomatik hesaplama** - Emisyon faktörleri ile otomatik CO2 hesabı
+-  **Optimizasyon senaryoları** - 3 senaryo ile maliyet azaltım önerileri
+-  **ROI analizi** - Yatırım geri ödeme ve karlılık hesaplamaları
+
 ###  ETS Fiyat Tahmini
 -  **Gemini LLM entegrasyonu** - Yapay zeka tabanlı tahmin
 -  **Çeyreklik projeksiyonlar** - Q1 2025 - Q4 2030
@@ -53,13 +61,18 @@ Profesyonel modüler AB CBAM (Carbon Border Adjustment Mechanism) hesaplama, ETS
 
 ###  Yönetici Raporları
 -  **Profesyonel formatlar** - Türkçe yönetici raporu
--  **Otomatik üretim** - Gemini ile akıllı rapor
--  **Stratejik öneriler** - Kısa, orta, uzun vadeli aksiyonlar
+-  **Otomatik üretim** - Gemini AI ile akıllı rapor (emisyon verileri dahil)
+-  **Stratejik öneriler** - Kısa, orta, uzun vadeli aksiyonlar (sayısal hedeflerle)
 -  **Risk analizi** - Detaylı risk değerlendirmesi
 -  **Finansal etki** - Bütçe ve nakit akışı analizi
+-  **Otomatik kaydetme** - Her rapor otomatik dosya sisteminize kaydedilir
+-  **PDF indirme** - Tek tıkla profesyonel PDF raporu
 
 ###  Kullanıcı Arayüzleri
--  **Web Arayüzü** - Flask tabanlı modern web uygulaması
+-  **Web Arayüzü** - Flask tabanlı minimal ve profesyonel tasarım
+-  **Responsive Tasarım** - Mobil ve masaüstü uyumlu
+-  **Minimal UI** - Beyaz/gri temiz tasarım (kurumsal görünüm)
+-  **4 Adımlı Analiz** - CBAM → ETS → Maliyet → Emisyon Analizi → Rapor
 -  **Komut Satırı** - CLI ile hızlı hesaplama
 -  **Python API** - Programatik kullanım için
 
@@ -81,19 +94,22 @@ cbam_project/
 │   ├── __init__.py                      # Paket başlatıcı
 │   ├── cn_code_database.py              # CN kod veritabanı (48 ürün)
 │   ├── cbam_calculator.py               # CBAM hesaplama motoru
+│   ├── emission_analyzer.py             # Scope 1&2 emisyon analizi (YENİ!)
 │   ├── ets_predictor.py                 # ETS fiyat tahmin modülü (LLM)
 │   ├── cbam_cost_forecaster.py          # CBAM maliyet tahmin modülü
-│   └── report_generator.py              # Yönetici raporu oluşturma
+│   ├── report_generator.py              # Yönetici raporu oluşturma (AI geliştirildi)
+│   └── pdf_generator.py                 # PDF rapor oluşturma (YENİ!)
 │
 ├──  web/                              # Web Uygulaması (Flask)
-│   ├── app.py                           # Flask sunucu
+│   ├── app.py                           # Flask sunucu (rapor kaydetme eklendi)
 │   ├── templates/                       # HTML şablonları
-│   │   ├── index.html                   # Ana form sayfası
-│   │   ├── results.html                 # Sonuç sayfası
+│   │   ├── index.html                   # Ana form sayfası (Scope 1&2 girişli)
+│   │   ├── results.html                 # Hızlı sonuç sayfası
+│   │   ├── full_results.html            # Detaylı analiz sayfası (YENİ!)
 │   │   ├── cn_codes.html                # CN kod listesi
 │   │   └── error.html                   # Hata sayfası
 │   └── static/                          # Statik dosyalar
-│       └── style.css                    # CSS tasarım
+│       └── style.css                    # Minimal UI tasarımı (güncellendi)
 │
 ├──  cli/                              # Komut Satırı Arayüzü
 │   └── cbam_cli.py                      # CLI uygulaması

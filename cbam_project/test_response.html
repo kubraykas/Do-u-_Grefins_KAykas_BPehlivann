@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hata</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container" style="text-align: center;">
+        <h1>❌ Hata</h1>
+        <div class="error-box">Analiz hatası: 403 PERMISSION_DENIED. {&#39;error&#39;: {&#39;code&#39;: 403, &#39;message&#39;: &#39;Your API key was reported as leaked. Please use another API key.&#39;, &#39;status&#39;: &#39;PERMISSION_DENIED&#39;}}&lt;br&gt;&lt;br&gt;&lt;pre&gt;Traceback (most recent call last):
+  File &#34;C:\Users\LENOVO\Desktop\Doğuş_Hackathon\cbam_project\web\app.py&#34;, line 221, in full_analysis
+    ets_forecast, ets_stats = predictor.predict(csv_path)
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File &#34;C:\Users\LENOVO\Desktop\Doğuş_Hackathon\cbam_project\src\ets_predictor.py&#34;, line 186, in predict
+    response = self.client.models.generate_content(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File &#34;C:\Users\LENOVO\anaconda3\Lib\site-packages\google\genai\models.py&#34;, line 5227, in generate_content
+    response = self._generate_content(
+               ^^^^^^^^^^^^^^^^^^^^^^^
+  File &#34;C:\Users\LENOVO\anaconda3\Lib\site-packages\google\genai\models.py&#34;, line 4009, in _generate_content
+    response = self._api_client.request(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File &#34;C:\Users\LENOVO\anaconda3\Lib\site-packages\google\genai\_api_client.py&#34;, line 1386, in request
+    response = self._request(http_request, http_options, stream=False)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File &#34;C:\Users\LENOVO\anaconda3\Lib\site-packages\google\genai\_api_client.py&#34;, line 1222, in _request
+    return self._retry(self._request_once, http_request, stream)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File &#34;C:\Users\LENOVO\anaconda3\Lib\site-packages\tenacity\__init__.py&#34;, line 477, in __call__
+    do = self.iter(retry_state=retry_state)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File &#34;C:\Users\LENOVO\anaconda3\Lib\site-packages\tenacity\__init__.py&#34;, line 378, in iter
+    result = action(retry_state)
+             ^^^^^^^^^^^^^^^^^^^
+  File &#34;C:\Users\LENOVO\anaconda3\Lib\site-packages\tenacity\__init__.py&#34;, line 420, in exc_check
+    raise retry_exc.reraise()
+          ^^^^^^^^^^^^^^^^^^^
+  File &#34;C:\Users\LENOVO\anaconda3\Lib\site-packages\tenacity\__init__.py&#34;, line 187, in reraise
+    raise self.last_attempt.result()
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File &#34;C:\Users\LENOVO\anaconda3\Lib\concurrent\futures\_base.py&#34;, line 449, in result
+    return self.__get_result()
+           ^^^^^^^^^^^^^^^^^^^
+  File &#34;C:\Users\LENOVO\anaconda3\Lib\concurrent\futures\_base.py&#34;, line 401, in __get_result
+    raise self._exception
+  File &#34;C:\Users\LENOVO\anaconda3\Lib\site-packages\tenacity\__init__.py&#34;, line 480, in __call__
+    result = fn(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^
+  File &#34;C:\Users\LENOVO\anaconda3\Lib\site-packages\google\genai\_api_client.py&#34;, line 1199, in _request_once
+    errors.APIError.raise_for_response(response)
+  File &#34;C:\Users\LENOVO\anaconda3\Lib\site-packages\google\genai\errors.py&#34;, line 121, in raise_for_response
+    cls.raise_error(response.status_code, response_json, response)
+  File &#34;C:\Users\LENOVO\anaconda3\Lib\site-packages\google\genai\errors.py&#34;, line 146, in raise_error
+    raise ClientError(status_code, response_json, response)
+google.genai.errors.ClientError: 403 PERMISSION_DENIED. {&#39;error&#39;: {&#39;code&#39;: 403, &#39;message&#39;: &#39;Your API key was reported as leaked. Please use another API key.&#39;, &#39;status&#39;: &#39;PERMISSION_DENIED&#39;}}
+&lt;/pre&gt;</div>
+        <a href="/" class="back-button">⬅️ Ana Sayfa</a>
+    </div>
+</body>
+</html>

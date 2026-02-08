@@ -9,21 +9,24 @@ cbam_project/
 │
 ├── src/                          # Ana kaynak kodlar
 │   ├── __init__.py
-│   ├── cn_code_database.py       # CN kod veritabanı
-│   ├── cbam_calculator.py        # Hesaplama motoru
-│   ├── ets_predictor.py          # ETS fiyat tahmini
+│   ├── cn_code_database.py       # CN kod veritabanı (48 ürün)
+│   ├── cbam_calculator.py        # CBAM hesaplama motoru
+│   ├── emission_analyzer.py      # Scope 1&2 emisyon analizi (YENİ!)
+│   ├── ets_predictor.py          # ETS fiyat tahmini (Gemini AI)
 │   ├── cbam_cost_forecaster.py   # Maliyet projeksiyonu
-│   └── report_generator.py       # Rapor üretimi
+│   ├── report_generator.py       # AI rapor üretimi (geliştirildi)
+│   └── pdf_generator.py          # PDF rapor oluşturma (YENİ!)
 │
 ├── web/                          # Web Uygulaması
-│   ├── app.py                    # Flask uygulaması
+│   ├── app.py                    # Flask uygulaması (rapor kaydetme eklendi)
 │   ├── templates/                # HTML şablonları
-│   │   ├── index.html
-│   │   ├── results.html
-│   │   ├── cn_codes.html
-│   │   └── error.html
+│   │   ├── index.html            # Ana form (Scope 1&2 girişli)
+│   │   ├── results.html          # Hızlı sonuç
+│   │   ├── full_results.html     # Detaylı analiz (YENİ!)
+│   │   ├── cn_codes.html         # CN kod listesi
+│   │   └── error.html            # Hata sayfası
 │   └── static/                   # CSS, JS, resimler
-│       └── style.css
+│       └── style.css             # Minimal beyaz/gri tasarım
 │
 ├── cli/                          # Komut Satırı Araçları
 │   └── cbam_cli.py              # CLI uygulaması
@@ -38,7 +41,8 @@ cbam_project/
 │   └── (ayar dosyaları)
 │
 ├── reports/                      # Oluşturulan raporlar
-│   └── (rapor çıktıları)
+│   ├── celik_raporu.txt          # Örnek rapor
+│   └── (otomatik kaydedilen raporlar)
 │
 ├── docs/                         # Dokümantasyon
 │   └── (kullanım kılavuzları)
@@ -101,10 +105,16 @@ Her modül için detaylı kullanım:
 
 ✅ CBAM maliyet hesaplama  
 ✅ 48+ ürün CN kodu desteği  
-✅ Web arayüzü  
+✅ Scope 1&2 emisyon analizi (YENİ!)  
+✅ Optimizasyon senaryoları (3 senaryo, ROI analizi)  
+✅ Otomatik rapor kaydetme (YENİ!)  
+✅ PDF indirme özelliği (YENİ!)  
+✅ Gemini AI entegrasyonu (sayısal öneriler)  
+✅ Minimal web arayüzü (beyaz/gri profesyonel tasarım)  
 ✅ Komut satırı arayüzü  
 ✅ Python API  
 ✅ Modüler yapı  
+✅ Session management (cookie limit fix)  
 
 ---
 

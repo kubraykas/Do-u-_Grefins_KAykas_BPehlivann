@@ -3,12 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hata</title>
+    <title>Hata - GreFins CBAM</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
     <div class="container" style="text-align: center;">
-        <h1>❌ Hata</h1>
+        <div style="display: inline-block; padding: 0.5rem 1rem; background: #eff6ff; border-radius: 20px; margin-bottom: 1rem;">
+            <span style="color: var(--primary); font-weight: 600; font-size: 0.875rem;">🌱 GreFins CBAM Intelligence</span>
+        </div>
+        <h1>❌ Bir Hata Oluştu</h1>
         <div class="error-box">{{ error }}</div>
         <a href="/" class="back-button">⬅️ Ana Sayfa</a>
     </div>
