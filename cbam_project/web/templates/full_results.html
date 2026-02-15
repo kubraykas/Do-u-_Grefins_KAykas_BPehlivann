@@ -35,7 +35,7 @@
             class="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-12 mb-24 pb-16 border-b border-borderDark/50">
             <div class="space-y-10">
                 <a href="/">
-                    <img src="{{ url_for('static', filename='favicon.png') }}" alt="GreFins" class="h-10 w-auto">
+                    <img src="{{ url_for('static', filename='favicon.png') }}" alt="GreFins" class="h-20 w-auto">
                 </a>
                 <div class="space-y-4">
                     <h1 class="text-5xl md:text-7xl font-black tracking-tighter leading-[1.1]">Stratejik <br>Analiz
@@ -265,30 +265,30 @@
 
         // 1. Emission Pie Chart
         const emissionCtx = document.getElementById('emissionChart').getContext('2d');
+        const scope1Val = {{ (emission_analysis.scope1.total_scope1 if emission_analysis and emission_analysis.scope1 else 0) | tojson }};
+        const scope2Val = {{ (emission_analysis.scope2.total_scope2 if emission_analysis and emission_analysis.scope2 else 0) | tojson }};
+
         new Chart(emissionCtx, {
             type: 'doughnut',
             data: {
                 labels: ['Scope 1', 'Scope 2'],
                 datasets: [{
-                    data: [
-                        {{ emission_analysis.scope1.total_scope1 if emission_analysis and emission_analysis.scope1 else 0 }},
-                {{ emission_analysis.scope2.total_scope2 if emission_analysis and emission_analysis.scope2 else 0 }}
-                    ],
-            backgroundColor: [primaryColor, '#10b981'],
-            borderColor: '#151E32',
-            borderWidth: 4
-        }]
+                    data: [scope1Val, scope2Val],
+                    backgroundColor: [primaryColor, '#10b981'],
+                    borderColor: '#151E32',
+                    borderWidth: 4
+                }]
             },
             options: {
-            responsive: true,
-            plugins: {
-                legend: {
-                    position: 'bottom',
-                    labels: { color: mutedColor, font: { weight: 'bold', size: 10 } }
-                }
-            },
-            cutout: '70%'
-        }
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: { color: mutedColor, font: { weight: 'bold', size: 10 } }
+                    }
+                },
+                cutout: '70%'
+            }
         });
 
         // 2. Cost Projection Line Chart

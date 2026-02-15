@@ -33,7 +33,7 @@
         <div class="max-w-[1400px] mx-auto px-6 h-20 flex items-center justify-between">
             <div class="flex items-center gap-12">
                 <a href="/">
-                    <img src="{{ url_for('static', filename='favicon.png') }}" alt="GreFins" class="h-8 w-auto">
+                    <img src="{{ url_for('static', filename='favicon.png') }}" alt="GreFins" class="h-14 w-auto">
                 </a>
                 <div class="hidden lg:flex items-center gap-10">
                     <a href="#"
@@ -41,8 +41,6 @@
                         Sunuyoruz</a>
                     <a href="/cn-codes"
                         class="text-[11px] font-bold uppercase tracking-widest text-textMain hover:text-primary transition-colors">Sektörler</a>
-                    <a href="/cn-codes"
-                        class="text-[11px] font-bold uppercase tracking-widest text-textMain hover:text-primary transition-colors">Veritabanı</a>
                 </div>
             </div>
             <div class="flex items-center gap-6">
@@ -198,14 +196,13 @@
                         </div>
                         <div class="space-y-4">
                             <label class="block text-[10px] font-black text-textMuted uppercase tracking-[0.2em]">CN
-                                Kodu Selection</label>
-                            <input type="text" name="cn_code" placeholder="Kod giriniz" required list="cn-codes"
+                                KODU Seçiniz</label>
+                            <input type="text" name="cn_code" placeholder="Kod giriniz" required list="cn-codes-list"
                                 class="w-full bg-pageBg border border-borderDark rounded-xl p-4 text-white font-bold focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all">
-                            <datalist id="cn-codes">
-                                <option value="7201">7201 - Pig iron</option>
-                                <option value="7601">7601 - Unwrought aluminium</option>
-                                <option value="2523 21 00">2523 21 00 - White Portland cement</option>
-                                <option value="3102 10">3102 10 - Urea</option>
+                            <datalist id="cn-codes-list">
+                                {% for code, data in cn_codes.items() %}
+                                <option value="{{ code }}">{{ code }} - {{ data.description }}</option>
+                                {% endfor %}
                             </datalist>
                         </div>
                     </div>

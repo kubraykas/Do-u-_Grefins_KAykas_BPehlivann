@@ -67,7 +67,7 @@ IMPORTANT: Use the EXACT values from the "Forecasted Value" column in the foreca
 """
         return prompt
     
-    def forecast(self, cbam_summary, ets_forecast_table, model="gemini-2.5-flash"):
+    def forecast(self, cbam_summary, ets_forecast_table, model="gemini-2.0-flash"):
         """
         Generate CBAM cost forecast
         

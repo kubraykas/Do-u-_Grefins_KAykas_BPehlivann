@@ -162,7 +162,7 @@ Quarter | Forecasted Value
 """
         return prompt
     
-    def predict(self, csv_path, model="gemini-2.5-flash"):
+    def predict(self, csv_path, model="gemini-2.0-flash"):
         """
         Generate ETS price forecast
         

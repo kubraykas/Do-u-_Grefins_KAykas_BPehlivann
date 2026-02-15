@@ -27,7 +27,9 @@ from src.pdf_generator import CBAMPDFGenerator
 # Environment variables
 load_dotenv()
 
-# Gemini client (optional)
+# Gemini configuration
+DEFAULT_MODEL = os.getenv('DEFAULT_MODEL', 'gemini-2.0-flash')
+
 try:
     from google import genai
     gemini_api_key = os.getenv('GOOGLE_API_KEY')
@@ -92,7 +94,7 @@ def save_report_to_aws(data):
 @app.route('/')
 def index():
     """Ana sayfa - Form"""
-    return render_template('index.html')
+    return render_template('index.html', cn_codes=CN_CODE_DATABASE)
 
 
 @app.route('/calculate', methods=['POST'])
@@ -292,13 +294,13 @@ def full_analysis():
             print(f"   Toplam: {emission_analysis['total_emissions']:.2f} tCO2")
             print(f"   Optimizasyon Senaryoları: {len(optimization_scenarios)} adet\n")
         
-        # === ADIM 2: ETS FİYAT TAHMİNİ ===
+        # === ADIM 2: ETS FİYAT TAHMİNLERİ ===
         predictor = ETSPricePredictor(gemini_client)
-        ets_forecast, ets_stats = predictor.predict(csv_path)
+        ets_forecast, ets_stats = predictor.predict(csv_path, model=DEFAULT_MODEL)
         
         # === ADIM 3: CBAM MALİYET PROJEKSİYONU ===
         forecaster = CBAMCostForecaster(gemini_client)
-        cbam_cost_forecast = forecaster.forecast(cbam_summary, ets_forecast)
+        cbam_cost_forecast = forecaster.forecast(cbam_summary, ets_forecast, model=DEFAULT_MODEL)
         
         # === ADIM 4: YÖNETİCİ RAPORU (Emisyon analizi dahil) ===
         generator = CBAMReportGenerator(gemini_client)
@@ -307,7 +309,8 @@ def full_analysis():
             ets_forecast, 
             cbam_cost_forecast,
             emission_analysis,
-            optimization_scenarios
+            optimization_scenarios,
+            model=DEFAULT_MODEL
         )
         
         # Session'a kaydet (sadece özet bilgiler - cookie limiti için)
