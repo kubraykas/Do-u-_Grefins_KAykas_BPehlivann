@@ -63,6 +63,11 @@ class ETSPricePredictor:
             df = df[['ETS Price']]
             df = df.sort_index()
             
+            # MEMORY OPTIMIZATION: Sadece son 200 kaydı tut (Tahmin için yeterli)
+            # Bu, Render'ın 512MB RAM sınırına takılmamızı önler.
+            if len(df) > 200:
+                df = df.tail(200)
+            
             return df
             
         except Exception as e:

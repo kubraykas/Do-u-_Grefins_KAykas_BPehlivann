@@ -378,8 +378,11 @@ def full_analysis():
             print(f"   Optimizasyon Senaryoları: {len(optimization_scenarios)} adet\n")
         
         # === ADIM 2: ETS FİYAT TAHMİNLERİ ===
+        import gc
+        gc.collect() # Belleği temizle
         predictor = ETSPricePredictor(gemini_client)
         ets_forecast, ets_stats = predictor.predict(csv_path, model=DEFAULT_MODEL)
+        gc.collect() # Belleği tekrar temizle
         
         # === ADIM 3: CBAM MALİYET PROJEKSİYONU ===
         forecaster = CBAMCostForecaster(gemini_client)
