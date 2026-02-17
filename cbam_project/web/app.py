@@ -14,7 +14,11 @@ from decimal import Decimal
 import uuid
 
 # Ana proje yolunu ekle
-sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if BASE_DIR not in sys.path:
+    sys.path.insert(0, BASE_DIR)
+    
+print(f"🚀 Başlatılıyor... Proje Dizini: {BASE_DIR}")
 
 from src.cbam_calculator import CBAMCalculator
 from src.cn_code_database import CN_CODE_DATABASE
