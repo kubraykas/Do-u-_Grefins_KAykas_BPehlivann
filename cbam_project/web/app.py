@@ -579,11 +579,14 @@ def download_pdf():
         return f"PDF oluşturma hatası: {str(e)}<br><br><pre>{error_detail}</pre>", 500
 
 
-if __name__ == '__main__':
+import os
+
+if __name__ == "__main__":
+    # Render için port ayarı
+    port = int(os.environ.get("PORT", 5001))
+    app.run(host='0.0.0.0', port=port)
     print("\n" + "="*70)
     print("🌍 CBAM WEB UYGULAMASI")
     print("="*70)
     print("\n📱 Adres: http://localhost:5001")
     print("🛑 Durdurmak için: CTRL+C\n")
-    
-    app.run(debug=True, host='0.0.0.0', port=5001)
