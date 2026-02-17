@@ -81,12 +81,24 @@ IMPORTANT: Use the EXACT values from the "Forecasted Value" column in the foreca
         """
         prompt = self.build_forecast_prompt(cbam_summary, ets_forecast_table)
         
-        response = self.client.models.generate_content(
-            model=model,
-            contents=prompt
-        )
+        import time
+        max_retries = 3
+        response = None
+        for attempt in range(max_retries):
+            try:
+                response = self.client.models.generate_content(
+                    model=model,
+                    contents=prompt
+                )
+                break
+            except Exception as e:
+                if "429" in str(e) and attempt < max_retries - 1:
+                    print(f"⚠️ Gemini Rate Limit (429) hit. Retrying in {attempt + 2} seconds...")
+                    time.sleep(attempt + 2)
+                else:
+                    raise e
         
-        return response.text
+        return response.text if response else ""
     
     def parse_forecast_response(self, llm_text):
         """

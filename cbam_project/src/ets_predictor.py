@@ -182,11 +182,23 @@ Quarter | Forecasted Value
         # Build prompt
         prompt = self.build_prediction_prompt(stats)
         
-        # Call Gemini
-        response = self.client.models.generate_content(
-            model=model,
-            contents=prompt
-        )
+        # Call Gemini with retry logic for rate limits
+        import time
+        max_retries = 3
+        response = None
+        for attempt in range(max_retries):
+            try:
+                response = self.client.models.generate_content(
+                    model=model,
+                    contents=prompt
+                )
+                break
+            except Exception as e:
+                if "429" in str(e) and attempt < max_retries - 1:
+                    print(f"⚠️ Gemini Rate Limit (429) hit. Retrying in {attempt + 2} seconds...")
+                    time.sleep(attempt + 2)
+                else:
+                    raise e
         
         # Parse response into DataFrame
         forecast_df = self._parse_forecast_response(response.text)

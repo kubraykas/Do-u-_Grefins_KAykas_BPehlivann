@@ -197,8 +197,21 @@ Firmadaki mevcut tüketim bazında SOMUT adımlar:
         
         prompt = self.build_report_prompt(metrics, formatted_emissions, formatted_optimizations)
         
-        response = self.client.models.generate_content(model=model, contents=prompt)
-        report_text = response.text
+        import time
+        max_retries = 3
+        response = None
+        for attempt in range(max_retries):
+            try:
+                response = self.client.models.generate_content(model=model, contents=prompt)
+                break
+            except Exception as e:
+                if "429" in str(e) and attempt < max_retries - 1:
+                    print(f"⚠️ Gemini Rate Limit (429) hit. Retrying in {attempt + 2} seconds...")
+                    time.sleep(attempt + 2)
+                else:
+                    raise e
+        
+        report_text = response.text if response else ""
         
         return {
             'metrics': metrics,
