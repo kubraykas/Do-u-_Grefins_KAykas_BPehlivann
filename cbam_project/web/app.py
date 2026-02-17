@@ -9,7 +9,6 @@ import sys
 from dotenv import load_dotenv
 from datetime import datetime
 import json
-import boto3
 from decimal import Decimal
 import uuid
 
@@ -20,36 +19,31 @@ if BASE_DIR not in sys.path:
     
 print(f"🚀 Başlatılıyor... Proje Dizini: {BASE_DIR}")
 
-from src.cbam_calculator import CBAMCalculator
-from src.cn_code_database import CN_CODE_DATABASE
-from src.ets_predictor import ETSPricePredictor
-from src.cbam_cost_forecaster import CBAMCostForecaster
-from src.report_generator import CBAMReportGenerator
-from src.emission_analyzer import EmissionAnalyzer
-from src.pdf_generator import CBAMPDFGenerator
-
 # Environment variables
 load_dotenv()
 
-# Gemini configuration
-DEFAULT_MODEL = os.getenv('DEFAULT_MODEL', 'gemini-2.0-flash')
-
-try:
-    from google import genai
-    gemini_api_key = os.getenv('GOOGLE_API_KEY')
-    gemini_client = genai.Client(api_key=gemini_api_key) if gemini_api_key else None
-except:
-    gemini_client = None
+# Gemini configuration (Lazy loaded to prevent startup timeout)
+def get_gemini_client():
+    try:
+        from google import genai
+        api_key = os.getenv('GOOGLE_API_KEY')
+        if not api_key:
+            return None
+        return genai.Client(api_key=api_key)
+    except:
+        return None
 
 app = Flask(__name__)
 app.secret_key = os.getenv('SECRET_KEY', 'cbam-secret-key-2026')
+DEFAULT_MODEL = os.getenv('DEFAULT_MODEL', 'gemini-2.0-flash')
 
-# Global storage for last report data (for PDF generation)
+# Global storage for last report data
 app.last_report_data = None
 
 # AWS DynamoDB Configuration
 def get_db_table():
     try:
+        import boto3
         session = boto3.Session(
             aws_access_key_id=os.getenv('AWS_ACCESS_KEY_ID'),
             aws_secret_access_key=os.getenv('AWS_SECRET_ACCESS_KEY'),
@@ -142,6 +136,7 @@ def dashboard():
 @app.route('/')
 def index():
     """Ana sayfa - Form"""
+    from src.cn_code_database import CN_CODE_DATABASE
     return render_template('index.html', cn_codes=CN_CODE_DATABASE)
 
 
@@ -240,6 +235,7 @@ def calculate():
 @app.route('/cn-codes')
 def cn_codes():
     """CN kodları listesi"""
+    from src.cn_code_database import CN_CODE_DATABASE
     codes = []
     for code, data in CN_CODE_DATABASE.items():
         codes.append({
@@ -255,6 +251,7 @@ def cn_codes():
 def full_analysis():
     """Tam analiz: CBAM + ETS Tahmin + Maliyet Projeksiyonu + Rapor"""
     try:
+        gemini_client = get_gemini_client()
         if not gemini_client:
             return render_template('error.html', 
                                  error="Gemini API yapılandırılmamış. .env dosyasına GOOGLE_API_KEY ekleyin.")
@@ -287,6 +284,7 @@ def full_analysis():
         csv_path = found_path
         
         # === ADIM 1: CBAM HESAPLAMA ===
+        from src.cbam_calculator import CBAMCalculator
         calc = CBAMCalculator(ets_price)
         cbam_summary = calc.get_summary(cn_code, quantity)
         
@@ -316,6 +314,7 @@ def full_analysis():
         cbam_summary.update(company_info)
         
         # === YENİ: SCOPE 1 & 2 ANALİZİ ===
+        from src.emission_analyzer import EmissionAnalyzer
         emission_analysis = None
         optimization_scenarios = None
         
@@ -376,19 +375,23 @@ def full_analysis():
             print(f"   Scope 2: {emission_analysis['scope2']['total_scope2'] if emission_analysis['scope2'] else 0:.2f} tCO2")
             print(f"   Toplam: {emission_analysis['total_emissions']:.2f} tCO2")
             print(f"   Optimizasyon Senaryoları: {len(optimization_scenarios)} adet\n")
-        
+            
         # === ADIM 2: ETS FİYAT TAHMİNLERİ ===
         import gc
         gc.collect() # Belleği temizle
+        from src.ets_predictor import ETSPricePredictor
+        gemini_client = get_gemini_client()
         predictor = ETSPricePredictor(gemini_client)
         ets_forecast, ets_stats = predictor.predict(csv_path, model=DEFAULT_MODEL)
         gc.collect() # Belleği tekrar temizle
         
         # === ADIM 3: CBAM MALİYET PROJEKSİYONU ===
+        from src.cbam_cost_forecaster import CBAMCostForecaster
         forecaster = CBAMCostForecaster(gemini_client)
         cbam_cost_forecast = forecaster.forecast(cbam_summary, ets_forecast, model=DEFAULT_MODEL)
         
         # === ADIM 4: YÖNETİCİ RAPORU (Emisyon analizi dahil) ===
+        from src.report_generator import CBAMReportGenerator
         generator = CBAMReportGenerator(gemini_client)
         report = generator.generate_report(
             cbam_summary, 
@@ -566,6 +569,7 @@ def download_pdf():
         report_data = app.last_report_data
         
         # PDF oluştur
+        from src.pdf_generator import CBAMPDFGenerator
         pdf_generator = CBAMPDFGenerator()
         
         pdf_buffer = pdf_generator.generate_report(
@@ -594,14 +598,7 @@ def download_pdf():
         return f"PDF oluşturma hatası: {str(e)}<br><br><pre>{error_detail}</pre>", 500
 
 
-import os
-
 if __name__ == "__main__":
     # Render için port ayarı
     port = int(os.environ.get("PORT", 5001))
     app.run(host='0.0.0.0', port=port)
-    print("\n" + "="*70)
-    print("🌍 CBAM WEB UYGULAMASI")
-    print("="*70)
-    print("\n📱 Adres: http://localhost:5001")
-    print("🛑 Durdurmak için: CTRL+C\n")
