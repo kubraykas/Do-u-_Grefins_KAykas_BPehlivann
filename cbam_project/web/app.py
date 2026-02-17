@@ -90,6 +90,50 @@ def save_report_to_aws(data):
         print(f"❌ AWS Kayıt Hatası: {e}")
         return False
 
+def convert_decimal_to_float(obj):
+    """DynamoDB'den gelen Decimal değerleri float'a çevirir (JSON için)"""
+    if isinstance(obj, list):
+        return [convert_decimal_to_float(i) for i in obj]
+    elif isinstance(obj, dict):
+        return {k: convert_decimal_to_float(v) for k, v in obj.items()}
+    elif isinstance(obj, Decimal):
+        return float(obj)
+    return obj
+
+def get_reports_from_aws(limit=50):
+    """AWS DynamoDB'den geçmiş raporları çek"""
+    table = get_db_table()
+    if not table:
+        return []
+    
+    try:
+        response = table.scan(Limit=limit)
+        items = response.get('Items', [])
+        # Tarihe göre sırala (en yeni en üstte)
+        items.sort(key=lambda x: x.get('created_at', ''), reverse=True)
+        return convert_decimal_to_float(items)
+    except Exception as e:
+        print(f"❌ AWS Veri Çekme Hatası: {e}")
+        return []
+
+
+@app.route('/dashboard')
+def dashboard():
+    """Kurumsal Dashboard - Geçmiş Analizler ve Trendler"""
+    reports = get_reports_from_aws()
+    
+    # Trend verisi hazırlama (Zaman serisi)
+    trend_data = []
+    for r in reversed(reports): # Eskiden yeniye
+        trend_data.append({
+            'date': r.get('created_at', '')[:10], # YYYY-MM-DD
+            'emissions': r.get('emission_analysis', {}).get('total_emissions', 0) or r.get('cbam_summary', {}).get('total_emission', 0),
+            'cost': r.get('cbam_summary', {}).get('cbam_cost', 0),
+            'company': r.get('company_info', {}).get('company_name', 'Bilinmiyor')
+        })
+    
+    return render_template('dashboard.html', reports=reports, trend_data=trend_data)
+
 
 @app.route('/')
 def index():
@@ -237,11 +281,23 @@ def full_analysis():
         company_info = {
             'company_name': request.form.get('company_name', 'Firma'),
             'origin_country': request.form.get('country_code', 'TR'),
+            'reporting_period': request.form.get('reporting_period', '2024'),
             'product_name': cbam_summary['product'],
             'cn_code': cn_code,
             'quantity': quantity,
-            'embedded_emissions': cbam_summary['total_ei']
+            'sector': request.form.get('sector', 'iron_steel'),
+            'production_route': request.form.get('production_route', 'eaf'),
+            'export_quantity': float(request.form.get('export_quantity', 0) or 0),
+            'financials': {
+                'annual_revenue': float(request.form.get('annual_revenue', 0) or 0),
+                'export_revenue': float(request.form.get('export_revenue', 0) or 0),
+                'profit_margin': float(request.form.get('profit_margin', 0) or 0),
+                'electricity_price': float(request.form.get('electricity_price', 90) or 90)
+            },
+            'scrap_rate': float(request.form.get('scrap_rate', 0) or 0),
+            'clinker_ratio': float(request.form.get('clinker_ratio', 95) or 95)
         }
+        cbam_summary.update(company_info)
         
         # === YENİ: SCOPE 1 & 2 ANALİZİ ===
         emission_analysis = None
@@ -251,18 +307,29 @@ def full_analysis():
         scope1_data = None
         scope2_data = None
         
-        if request.form.get('natural_gas_nm3') or request.form.get('coking_coal_ton'):
+        if any([request.form.get(f) for f in ['natural_gas_nm3', 'coking_coal_ton', 'diesel_liter', 'purchased_heat_mwh']]):
             scope1_data = {
                 'fuel': {
                     'coking_coal_ton': float(request.form.get('coking_coal_ton', 0) or 0),
                     'natural_gas_nm3': float(request.form.get('natural_gas_nm3', 0) or 0),
                     'fuel_oil_ton': float(request.form.get('fuel_oil_ton', 0) or 0)
                 },
+                'mobile': {
+                    'diesel_liter': float(request.form.get('diesel_liter', 0) or 0)
+                },
                 'process': {
-                    'limestone_ton': float(request.form.get('limestone_ton', 0) or 0)
+                    'limestone_ton': float(request.form.get('limestone_ton', 0) or 0),
+                    'electrode_ton': float(request.form.get('electrode_ton', 0) or 0),
+                    'anode_ton': float(request.form.get('anode_ton', 0) or 0),
+                    'reductants_ton': float(request.form.get('reductants_ton', 0) or 0),
+                    'pfc_emissions_ton': float(request.form.get('pfc_emissions_ton', 0) or 0),
+                    'ammonia_ton': float(request.form.get('ammonia_ton', 0) or 0),
+                    'nitric_acid_ton': float(request.form.get('nitric_acid_ton', 0) or 0),
+                    'alloy_elements_ton': float(request.form.get('alloy_elements_ton', 0) or 0)
                 },
                 'thermal_systems': {
-                    'reheating_fuel_nm3': float(request.form.get('reheating_fuel_nm3', 0) or 0)
+                    'reheating_fuel_nm3': float(request.form.get('reheating_fuel_nm3', 0) or 0),
+                    'purchased_heat_mwh': float(request.form.get('purchased_heat_mwh', 0) or 0)
                 },
                 'steel_output_ton': float(request.form.get('steel_output_ton', 0) or 5000)
             }
@@ -271,8 +338,8 @@ def full_analysis():
             scope2_data = {
                 'electricity': {
                     'electricity_consumption_mwh': float(request.form.get('electricity_consumption_mwh', 0) or 0),
-                    'grid_emission_factor_kgco2_kwh': float(request.form.get('grid_emission_factor', 0) or 0),
-                    'renewable_share_percent': float(request.form.get('renewable_share_percent', 0) or 0)
+                    'grid_emission_factor_kgco2_kwh': float(request.form.get('grid_emission_factor', 0.44) or 0.44),
+                    'source_type': request.form.get('electricity_source', 'grid') 
                 }
             }
         
@@ -410,14 +477,15 @@ ETS FİYAT TAHMİNLERİ (İlk 8 Çeyrek)
             # Optimizasyon senaryoları
             if optimization_scenarios:
                 report_content += f"\n{'='*80}\nOPTİMİZASYON SENARYOLARI\n{'='*80}\n\n"
-                for idx, scenario in enumerate(optimization_scenarios, 1):
-                    report_content += f"{idx}. {scenario['name']}\n"
-                    report_content += f"   Açıklama: {scenario['description']}\n"
-                    report_content += f"   Emisyon Azaltımı: {scenario['emission_reduction']:,.2f} tCO2 ({scenario['reduction_percent']:.1f}%)\n"
-                    report_content += f"   Maliyet Tasarrufu: €{scenario['cost_saving']:,.2f}\n"
-                    report_content += f"   Yatırım: €{scenario['investment']:,.2f}\n"
-                    report_content += f"   Geri Ödeme: {scenario['payback_years']:.1f} yıl\n"
-                    report_content += f"   ROI: %{scenario['roi']:.1f}\n\n"
+                
+                # Eğer dict gelirse listeye çevir (compatibility)
+                scenarios_list = optimization_scenarios.values() if isinstance(optimization_scenarios, dict) else optimization_scenarios
+                
+                for idx, scenario in enumerate(scenarios_list, 1):
+                    report_content += f"{idx}. {scenario.get('name', 'İyileştirme')}\n"
+                    report_content += f"   Emisyon Azaltımı: {scenario.get('emission_saving_tco2', 0):,.2f} tCO2\n"
+                    report_content += f"   Maliyet Tasarrufu: €{scenario.get('annual_cbam_saving_eur', 0):,.2f}\n"
+                    report_content += f"   Geri Ödeme Süresi: {scenario.get('roi_years', 0):,.1f} yıl\n\n"
             
             # Yönetici raporu
             report_content += f"\n{'='*80}\nYÖNETİCİ RAPORU (AI Tarafından Oluşturuldu)\n{'='*80}\n\n"

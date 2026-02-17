@@ -39,6 +39,8 @@
                     <a href="#"
                         class="text-[11px] font-bold uppercase tracking-widest text-textMain hover:text-primary transition-colors">Ne
                         Sunuyoruz</a>
+                    <a href="/dashboard"
+                        class="text-[11px] font-bold uppercase tracking-widest text-primary hover:text-primary transition-colors">Dashboard</a>
                     <a href="/cn-codes"
                         class="text-[11px] font-bold uppercase tracking-widest text-textMain hover:text-primary transition-colors">Sektörler</a>
                 </div>
@@ -125,217 +127,221 @@
                         </div>
                     </div>
                 </div>
-                <!-- Floating Card 1 -->
-                <div
-                    class="absolute -bottom-12 -left-12 bg-pageBg border border-borderDark p-8 rounded-3xl shadow-2xl w-72 z-10 animate-fadeIn border-l-4 border-l-primary/50">
-                    <div class="flex items-center gap-5">
-                        <div
-                            class="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary border border-primary/20">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
-                                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                            </svg>
-                        </div>
-                        <div>
-                            <div class="text-[10px] font-black text-textMuted uppercase tracking-widest mb-1">DÜŞÜK RİSK
-                            </div>
-                            <div class="text-sm font-bold">CBAM Uyumlu</div>
-                        </div>
-                    </div>
-                </div>
-                <!-- Floating Card 2 -->
-                <div
-                    class="absolute -top-12 -right-12 bg-pageBg border border-borderDark p-6 rounded-2xl shadow-2xl z-10 animate-slideUp border-r-4 border-r-primary">
-                    <div class="flex items-center gap-4">
-                        <div class="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center text-primary">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M5 13l4 4L19 7"></path>
-                            </svg>
-                        </div>
-                        <div>
-                            <div class="text-[9px] font-black text-textMuted uppercase tracking-widest">HEDEF BAŞARILI
-                            </div>
-                            <div class="text-xs font-bold">Karbon Nötr</div>
-                        </div>
-                    </div>
-                </div>
             </div>
         </div>
     </main>
 
     <!-- Calculator Section -->
     <section id="calculator-section" class="hidden py-32 px-6 animate-fadeIn bg-[#090E1A]">
-        <div class="max-w-5xl mx-auto">
-            <div class="text-center mb-20 space-y-4">
+        <div class="max-w-6xl mx-auto">
+            <div class="text-center mb-16 space-y-4">
                 <h2 class="text-4xl md:text-5xl font-black tracking-tight uppercase">CBAM Akıllı Hesaplayıcı</h2>
                 <div class="w-20 h-1.5 bg-primary mx-auto rounded-full"></div>
-                <p class="text-textMuted text-lg font-medium pt-4">Endüstriyel verilerinizi girerek anlık analiz raporu
-                    oluşturun.</p>
+                <p class="text-textMuted text-lg font-medium pt-4">Endüstriyel verilerinizi girerek anlık stratejik
+                    analiz raporu oluşturun.</p>
             </div>
 
-            <form method="POST" action="/calculate" class="space-y-12">
-                <div class="bg-cardBg border border-borderDark rounded-[32px] p-12 shadow-2xl">
-                    <h3
-                        class="text-xs font-black uppercase tracking-[0.3em] text-primary mb-12 flex items-center gap-4">
+            <form method="POST" action="/calculate" class="space-y-8" id="analysisForm">
+
+                <!-- 1. KATEGORİ: Kurumsal Kimlik -->
+                <div class="bg-cardBg border border-borderDark rounded-[32px] p-10 shadow-lg">
+                    <h3 class="text-sm font-black uppercase tracking-[0.2em] text-primary mb-8 flex items-center gap-3">
                         <span class="w-2 h-2 bg-primary rounded-full"></span>
-                        Temel Analiz Parametreleri
+                        1. Kurumsal Kimlik ve Üretim Profili
                     </h3>
-                    <div class="grid md:grid-cols-3 gap-10">
-                        <div class="space-y-4">
-                            <label class="block text-[10px] font-black text-textMuted uppercase tracking-[0.2em]">ETS
-                                Fiyatı (€/tCO2)</label>
-                            <input type="number" step="0.01" name="ets_price" value="85.0" required
-                                class="w-full bg-pageBg border border-borderDark rounded-xl p-4 text-white font-bold focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all">
+                    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-8">
+                        <div class="space-y-3">
+                            <label class="block text-[10px] font-black text-textMuted uppercase tracking-widest">Firma
+                                Adı</label>
+                            <input type="text" name="company_name" placeholder="Firma Ünvanı"
+                                class="w-full bg-pageBg border border-borderDark rounded-xl p-4 text-white font-bold focus:border-primary outline-none transition-all">
                         </div>
-                        <div class="space-y-4">
-                            <label class="block text-[10px] font-black text-textMuted uppercase tracking-[0.2em]">Miktar
-                                (ton)</label>
-                            <input type="number" step="0.01" name="quantity" value="1000" required
-                                class="w-full bg-pageBg border border-borderDark rounded-xl p-4 text-white font-bold focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all">
+                        <div class="space-y-3">
+                            <label class="block text-[10px] font-black text-textMuted uppercase tracking-widest">Menşei
+                                Ülke</label>
+                            <select name="country_code"
+                                class="w-full bg-pageBg border border-borderDark rounded-xl p-4 text-white font-bold focus:border-primary outline-none transition-all appearance-none">
+                                <option value="TR">Türkiye</option>
+                                <option value="CN">Çin</option>
+                                <option value="IN">Hindistan</option>
+                                <option value="AE">BAE</option>
+                                <option value="US">ABD</option>
+                            </select>
                         </div>
-                        <div class="space-y-4">
-                            <label class="block text-[10px] font-black text-textMuted uppercase tracking-[0.2em]">CN
-                                KODU Seçiniz</label>
-                            <input type="text" name="cn_code" placeholder="Kod giriniz" required list="cn-codes-list"
-                                class="w-full bg-pageBg border border-borderDark rounded-xl p-4 text-white font-bold focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all">
+                        <div class="space-y-3">
+                            <label
+                                class="block text-[10px] font-black text-textMuted uppercase tracking-widest">Raporlama
+                                Dönemi</label>
+                            <select name="reporting_period"
+                                class="w-full bg-pageBg border border-borderDark rounded-xl p-4 text-white font-bold focus:border-primary outline-none transition-all appearance-none">
+                                <option value="2024">2024 (Tam Yıl)</option>
+                                <option value="2023_Q4">2023 Q4</option>
+                                <option value="2025_Plan">2025 Projeksiyon</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+                        <div class="space-y-3">
+                            <label
+                                class="block text-[10px] font-black text-textMuted uppercase tracking-widest">Sektör</label>
+                            <select name="sector" id="sectorSelect" onchange="updateSectorFields()"
+                                class="w-full bg-pageBg border border-borderDark rounded-xl p-4 text-white font-bold focus:border-primary outline-none transition-all appearance-none">
+                                <option value="iron_steel">Demir-Çelik</option>
+                                <option value="aluminum">Alüminyum</option>
+                                <option value="cement">Çimento</option>
+                                <option value="fertilizer">Gübre</option>
+                            </select>
+                        </div>
+                        <div class="space-y-3">
+                            <label class="block text-[10px] font-black text-textMuted uppercase tracking-widest">Üretim
+                                Rotası</label>
+                            <select name="production_route" id="routeSelect"
+                                class="w-full bg-pageBg border border-borderDark rounded-xl p-4 text-white font-bold focus:border-primary outline-none transition-all appearance-none">
+                                <option value="eaf">Elektrik Ark Ocağı (EAF)</option>
+                                <option value="bof">Entegre Tesis (BOF)</option>
+                            </select>
+                        </div>
+                        <div class="space-y-3">
+                            <label class="block text-[10px] font-black text-textMuted uppercase tracking-widest">CN Code
+                                (GTİP)</label>
+                            <input type="text" name="cn_code" placeholder="Örn: 7214" required list="cn-codes-list"
+                                class="w-full bg-pageBg border border-borderDark rounded-xl p-4 text-white font-bold focus:border-primary outline-none transition-all">
                             <datalist id="cn-codes-list">
                                 {% for code, data in cn_codes.items() %}
                                 <option value="{{ code }}">{{ code }} - {{ data.description }}</option>
                                 {% endfor %}
                             </datalist>
                         </div>
-                    </div>
-                </div>
-
-                <!-- Advanced Emission Data (Expandable) -->
-                <div class="bg-cardBg border border-borderDark rounded-[32px] overflow-hidden shadow-2xl">
-                    <button type="button" onclick="toggleAdvanced()"
-                        class="w-full p-10 flex items-center justify-between hover:bg-white/5 transition-all text-left group">
-                        <div class="space-y-2">
-                            <h3
-                                class="text-sm font-black uppercase tracking-[0.2em] text-white group-hover:text-primary transition-colors">
-                                Detaylı Emisyon Verileri</h3>
-                            <p class="text-textMuted text-xs font-medium">Opsiyonel: Tesis bazlı Scope 1 & 2
-                                verilerinizi girerek daha hassas bir analiz elde edin</p>
-                        </div>
-                        <svg id="expandIcon" class="w-6 h-6 transition-transform text-primary" fill="none"
-                            stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7">
-                            </path>
-                        </svg>
-                    </button>
-
-                    <div id="advancedSection" class="hidden p-10 pt-0 space-y-12 border-t border-borderDark/30">
-                        <!-- Facility Info -->
-                        <div class="pt-8 space-y-6">
-                            <h4
-                                class="text-xs font-black uppercase tracking-[0.3em] text-primary flex items-center gap-3">
-                                <span class="w-2 h-2 bg-primary rounded-full"></span>
-                                Tesis Bilgileri
-                            </h4>
-                            <div class="grid md:grid-cols-3 gap-8">
-                                <div class="space-y-3">
-                                    <label
-                                        class="block text-[10px] font-black text-textMuted uppercase tracking-[0.2em]">Tesis
-                                        ID</label>
-                                    <input type="text" name="plant_id" placeholder="TR_STEEL_01"
-                                        class="w-full bg-pageBg border border-borderDark rounded-xl p-4 text-white font-medium focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all">
-                                </div>
-                                <div class="space-y-3">
-                                    <label
-                                        class="block text-[10px] font-black text-textMuted uppercase tracking-[0.2em]">Ülke
-                                        Kodu</label>
-                                    <input type="text" name="country_code" placeholder="TR" maxlength="2"
-                                        class="w-full bg-pageBg border border-borderDark rounded-xl p-4 text-white font-medium focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all">
-                                </div>
-                                <div class="space-y-3">
-                                    <label
-                                        class="block text-[10px] font-black text-textMuted uppercase tracking-[0.2em]">Raporlama
-                                        Yılı</label>
-                                    <input type="number" name="reporting_year" placeholder="2025"
-                                        class="w-full bg-pageBg border border-borderDark rounded-xl p-4 text-white font-medium focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all">
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Scope 1 Data -->
-                        <div class="space-y-6">
-                            <h4
-                                class="text-xs font-black uppercase tracking-[0.3em] text-white flex items-center gap-3">
-                                <span class="w-2 h-2 bg-white rounded-full"></span>
-                                Scope 1 - Doğrudan Emisyonlar
-                            </h4>
-                            <div class="grid md:grid-cols-3 gap-8">
-                                <div class="space-y-3">
-                                    <label
-                                        class="block text-[10px] font-black text-textMuted uppercase tracking-[0.2em]">Kok
-                                        Kömürü (ton)</label>
-                                    <input type="number" step="0.01" name="coking_coal_ton" placeholder="0.00"
-                                        class="w-full bg-pageBg border border-borderDark rounded-xl p-4 text-white font-medium focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all">
-                                </div>
-                                <div class="space-y-3">
-                                    <label
-                                        class="block text-[10px] font-black text-textMuted uppercase tracking-[0.2em]">Doğalgaz
-                                        (Nm³)</label>
-                                    <input type="number" step="0.01" name="natural_gas_nm3" placeholder="0.00"
-                                        class="w-full bg-pageBg border border-borderDark rounded-xl p-4 text-white font-medium focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all">
-                                </div>
-                                <div class="space-y-3">
-                                    <label
-                                        class="block text-[10px] font-black text-textMuted uppercase tracking-[0.2em]">Fuel
-                                        Oil (ton)</label>
-                                    <input type="number" step="0.01" name="fuel_oil_ton" placeholder="0.00"
-                                        class="w-full bg-pageBg border border-borderDark rounded-xl p-4 text-white font-medium focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all">
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Scope 2 Data -->
-                        <div class="space-y-6">
-                            <h4
-                                class="text-xs font-black uppercase tracking-[0.3em] text-white flex items-center gap-3">
-                                <span class="w-2 h-2 bg-white rounded-full"></span>
-                                Scope 2 - Dolaylı Emisyonlar & Üretim
-                            </h4>
-                            <div class="grid md:grid-cols-3 gap-8">
-                                <div class="space-y-3">
-                                    <label
-                                        class="block text-[10px] font-black text-textMuted uppercase tracking-[0.2em]">Elektrik
-                                        Tüketimi (MWh)</label>
-                                    <input type="number" step="0.01" name="electricity_consumption_mwh"
-                                        placeholder="0.00"
-                                        class="w-full bg-pageBg border border-borderDark rounded-xl p-4 text-white font-medium focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all">
-                                </div>
-                                <div class="space-y-3">
-                                    <label
-                                        class="block text-[10px] font-black text-textMuted uppercase tracking-[0.2em]">Grid
-                                        Faktörü (kgCO2/kWh)</label>
-                                    <input type="number" step="0.001" name="grid_emission_factor" placeholder="0.000"
-                                        class="w-full bg-pageBg border border-borderDark rounded-xl p-4 text-white font-medium focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all">
-                                </div>
-                                <div class="space-y-3">
-                                    <label
-                                        class="block text-[10px] font-black text-textMuted uppercase tracking-[0.2em]">Çelik
-                                        Üretimi (ton)</label>
-                                    <input type="number" step="0.01" name="steel_output_ton" placeholder="0.00"
-                                        class="w-full bg-pageBg border border-borderDark rounded-xl p-4 text-white font-medium focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all">
-                                </div>
-                            </div>
+                        <div class="space-y-3">
+                            <label class="block text-[10px] font-black text-textMuted uppercase tracking-widest">AB
+                                İhracat (Ton)</label>
+                            <input type="number" step="0.01" name="export_quantity" value="1000"
+                                class="w-full bg-pageBg border border-borderDark rounded-xl p-4 text-white font-bold focus:border-primary outline-none transition-all">
                         </div>
                     </div>
                 </div>
 
-                <div class="flex flex-col md:flex-row gap-6">
-                    <button type="submit" name="action" value="calculate"
-                        class="flex-1 bg-white/5 border border-borderDark hover:border-textMuted py-6 rounded-full font-black text-sm uppercase tracking-widest transition-all">
-                        Hızlı Hesaplama
-                    </button>
+                <!-- 2. KATEGORİ: Emisyon Girdileri -->
+                <div class="bg-cardBg border border-borderDark rounded-[32px] p-10 shadow-lg">
+                    <h3 class="text-sm font-black uppercase tracking-[0.2em] text-white mb-8 flex items-center gap-3">
+                        <span class="w-2 h-2 bg-white rounded-full"></span>
+                        2. Teknik Emisyon Verileri (Zorunlu)
+                    </h3>
+
+                    <!-- Scope 2 -->
+                    <div class="mb-8 p-6 bg-pageBg/50 rounded-2xl border border-borderDark/50">
+                        <span class="text-xs font-bold text-primary mb-4 block">A. Elektrik ve Dış Enerji (Scope 2 &
+                            Purchased Heat)</span>
+                        <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                            <div class="space-y-2">
+                                <label class="text-[10px] uppercase font-bold text-textMuted">Elk. Tüketim (MWh)</label>
+                                <input type="number" step="0.01" name="electricity_consumption_mwh" placeholder="0.00"
+                                    class="w-full bg-cardBg border border-borderDark rounded-lg p-3 text-white focus:border-primary outline-none">
+                            </div>
+                            <div class="space-y-2">
+                                <label class="text-[10px] uppercase font-bold text-textMuted">Tedarik Tipi</label>
+                                <select name="electricity_source"
+                                    class="w-full bg-cardBg border border-borderDark rounded-lg p-3 text-white focus:border-primary outline-none">
+                                    <option value="grid">Şebeke (Grid)</option>
+                                    <option value="irec">I-REC/Yeşil</option>
+                                    <option value="solar">Öz Tüketim (GES)</option>
+                                </select>
+                            </div>
+                            <div class="space-y-2">
+                                <label class="text-[10px] uppercase font-bold text-textMuted">Satın Alınan Isı
+                                    (MWh)</label>
+                                <input type="number" step="0.01" name="purchased_heat_mwh" placeholder="Buhar/Sıcak Su"
+                                    class="w-full bg-cardBg border border-borderDark rounded-lg p-3 text-white focus:border-primary outline-none">
+                            </div>
+                            <div class="space-y-2">
+                                <label class="text-[10px] uppercase font-bold text-textMuted">Şebeke Faktörü
+                                    (kg/kWh)</label>
+                                <input type="number" step="0.001" name="grid_emission_factor" value="0.44"
+                                    class="w-full bg-cardBg border border-borderDark rounded-lg p-3 text-white focus:border-primary outline-none">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Scope 1 -->
+                    <div class="p-6 bg-pageBg/50 rounded-2xl border border-borderDark/50">
+                        <div class="flex items-center justify-between mb-4">
+                            <span class="text-xs font-bold text-primary block">B. Doğrudan Emisyonlar (Scope 1)</span>
+                            <div class="space-y-1">
+                                <label class="text-[9px] uppercase font-bold text-textMuted">Yıllık Toplam Üretim
+                                    (Ton)</label>
+                                <input type="number" step="0.01" name="steel_output_ton" value="10000"
+                                    class="w-32 bg-cardBg border border-borderDark rounded p-1 text-xs text-white focus:border-primary outline-none">
+                            </div>
+                        </div>
+                        <div class="grid md:grid-cols-3 gap-6">
+                            <div class="space-y-2">
+                                <label class="text-[10px] uppercase font-bold text-textMuted">Doğalgaz (Nm³)</label>
+                                <input type="number" step="0.01" name="natural_gas_nm3" placeholder="Yanma Amaçlı"
+                                    class="w-full bg-cardBg border border-borderDark rounded-lg p-3 text-white focus:border-primary outline-none">
+                            </div>
+                            <div class="space-y-2">
+                                <label class="text-[10px] uppercase font-bold text-textMuted">Kömür / Kok (Ton)</label>
+                                <input type="number" step="0.01" name="coking_coal_ton" placeholder="0.00"
+                                    class="w-full bg-cardBg border border-borderDark rounded-lg p-3 text-white focus:border-primary outline-none">
+                            </div>
+                            <div class="space-y-2">
+                                <label class="text-[10px] uppercase font-bold text-textMuted">Motorin (Litre)</label>
+                                <input type="number" step="0.01" name="diesel_liter" placeholder="Forklift/Araç"
+                                    class="w-full bg-cardBg border border-borderDark rounded-lg p-3 text-white focus:border-primary outline-none">
+                            </div>
+                        </div>
+
+                        <!-- Sektöre Özel Detaylar -->
+                        <div id="sectorSpecifics"
+                            class="mt-6 pt-6 border-t border-borderDark/30 grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                            <!-- JS ile doldurulur -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. KATEGORİ: Finansal Veriler -->
+                <div class="bg-cardBg border border-borderDark rounded-[32px] p-10 shadow-lg">
+                    <h3 class="text-sm font-black uppercase tracking-[0.2em] text-white mb-8 flex items-center gap-3">
+                        <span class="w-2 h-2 bg-white rounded-full"></span>
+                        3. Finansal Metrikler (ROI ve Maliyet Analizi)
+                    </h3>
+                    <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+                        <div class="space-y-3">
+                            <label class="block text-[10px] font-black text-textMuted uppercase tracking-widest">Yıllık
+                                Ciro (€)</label>
+                            <input type="number" step="0.01" name="annual_revenue" placeholder="Opsiyonel"
+                                class="w-full bg-pageBg border border-borderDark rounded-xl p-4 text-white font-bold focus:border-primary outline-none">
+                        </div>
+                        <div class="space-y-3">
+                            <label class="block text-[10px] font-black text-textMuted uppercase tracking-widest">İhracat
+                                Geliri (€)</label>
+                            <input type="number" step="0.01" name="export_revenue" placeholder="Tahmini"
+                                class="w-full bg-pageBg border border-borderDark rounded-xl p-4 text-white font-bold focus:border-primary outline-none">
+                        </div>
+                        <div class="space-y-3">
+                            <label class="block text-[10px] font-black text-textMuted uppercase tracking-widest">Elk.
+                                Birim Fiyatı (€/MWh)</label>
+                            <input type="number" step="0.01" name="electricity_price" value="95"
+                                class="w-full bg-pageBg border border-borderDark rounded-xl p-4 text-white font-bold focus:border-primary outline-none">
+                        </div>
+                        <div class="space-y-3">
+                            <label class="block text-[10px] font-black text-textMuted uppercase tracking-widest">Net Kâr
+                                Marjı (%)</label>
+                            <input type="number" step="0.1" name="profit_margin" placeholder="%"
+                                class="w-full bg-pageBg border border-borderDark rounded-xl p-4 text-white font-bold focus:border-primary outline-none">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pt-8">
                     <button type="submit" name="action" value="full-analysis"
-                        class="flex-1 bg-primary hover:bg-primaryHover text-pageBg py-6 rounded-full font-black text-sm uppercase tracking-widest transition-all shadow-lg transform hover:scale-[1.02]">
-                        Tam Analiz ve Risk Raporu
+                        class="w-full bg-primary hover:bg-primaryHover text-pageBg py-6 rounded-full font-black text-sm uppercase tracking-widest transition-all shadow-[0_0_40px_rgba(201,253,2,0.3)] transform hover:scale-[1.01]">
+                        STRATEJİK SÜRDÜRÜLEBİLİRLİK RAPORU OLUŞTUR
                     </button>
                 </div>
+
+                <input type="hidden" name="ets_price" value="85.0">
+                <input type="hidden" name="quantity" value="1000">
             </form>
         </div>
     </section>
@@ -349,12 +355,65 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        function toggleAdvanced() {
-            const section = document.getElementById('advancedSection');
-            const icon = document.getElementById('expandIcon');
-            section.classList.toggle('hidden');
-            icon.classList.toggle('rotate-180');
+        function createField(label, name, placeholder, type = "number", step = "0.01") {
+            const div = document.createElement('div');
+            div.className = 'space-y-2';
+            div.innerHTML = `
+                <label class="text-[10px] uppercase font-bold text-textMuted">${label}</label>
+                <input type="${type}" step="${step}" name="${name}" placeholder="${placeholder}"
+                    class="w-full bg-cardBg border border-borderDark rounded-lg p-3 text-white focus:border-primary outline-none">
+            `;
+            return div;
         }
+
+        function updateSectorFields() {
+            const sector = document.getElementById('sectorSelect').value;
+            const routeSelect = document.getElementById('routeSelect');
+            const specifics = document.getElementById('sectorSpecifics');
+
+            routeSelect.innerHTML = '';
+            specifics.innerHTML = '';
+
+            if (sector === 'iron_steel') {
+                const routes = [
+                    { val: 'eaf', text: 'Elektrik Ark Ocağı (EAF)' },
+                    { val: 'bof', text: 'Entegre Tesis (BOF)' }
+                ];
+                routes.forEach(r => {
+                    const opt = document.createElement('option');
+                    opt.value = r.val; opt.textContent = r.text;
+                    routeSelect.appendChild(opt);
+                });
+                specifics.appendChild(createField('Elektrot Tüketimi (Ton)', 'electrode_ton', 'EAF İçin'));
+                specifics.appendChild(createField('Kömür/Redüktan (Ton)', 'reductants_ton', 'Enjeksiyon'));
+                specifics.appendChild(createField('Kireçtaşı/Dolomit (Ton)', 'limestone_ton', 'Fluxes'));
+                specifics.appendChild(createField('Hurda Oranı (%)', 'scrap_rate', '0-100', 'range', '1'));
+            }
+            else if (sector === 'aluminum') {
+                const opt = document.createElement('option');
+                opt.value = 'primary'; opt.textContent = 'Birincil (Elektroliz)';
+                routeSelect.appendChild(opt);
+                specifics.appendChild(createField('Anot Tüketimi (Ton)', 'anode_ton', 'Karbon Anot'));
+                specifics.appendChild(createField('PFC Gaz Etkisi (tCO2e)', 'pfc_emissions_ton', 'Anot Etkisi'));
+                specifics.appendChild(createField('Alaşım Elementleri (Ton)', 'alloy_elements_ton', 'Mg, Si vb.'));
+            }
+            else if (sector === 'cement') {
+                const opt = document.createElement('option');
+                opt.value = 'integrated'; opt.textContent = 'Entegre (Klinker+)';
+                routeSelect.appendChild(opt);
+                specifics.appendChild(createField('Klinker Oranı (%)', 'clinker_ratio', '95', 'range', '1'));
+            }
+            else if (sector === 'fertilizer') {
+                const opt = document.createElement('option');
+                opt.value = 'ammonia'; opt.textContent = 'Amonyak/Üre Üretimi';
+                routeSelect.appendChild(opt);
+                specifics.appendChild(createField('Amonyak Üretimi (Ton)', 'ammonia_ton', 'Net miktar'));
+                specifics.appendChild(createField('Nitrik Asit (Ton)', 'nitric_acid_ton', 'N2O Dahil'));
+                specifics.appendChild(createField('Hammadde Doğalgaz (Nm³)', 'natural_gas_feedstock_nm3', 'Non-combustion'));
+            }
+        }
+
+        window.addEventListener('load', updateSectorFields);
     </script>
 </body>
 

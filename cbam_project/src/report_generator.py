@@ -39,7 +39,13 @@ class CBAMReportGenerator:
             'total_ei': cbam_summary.get('total_ei', 0),
             'total_emission': cbam_summary.get('total_emission', 0),
             'current_cbam_cost': cbam_summary.get('cbam_cost', 0),
-            'company_name': cbam_summary.get('company_name', 'Executive Leadership')
+            'company_name': cbam_summary.get('company_name', 'Executive Leadership'),
+            'sector': cbam_summary.get('sector', 'iron_steel'),
+            'production_route': cbam_summary.get('production_route', 'eaf'),
+            'financials': cbam_summary.get('financials', {}),
+            'reporting_period': cbam_summary.get('reporting_period', '2024'),
+            'origin_country': cbam_summary.get('origin_country', 'TR'),
+            'export_quantity': cbam_summary.get('export_quantity', 0)
         }
         
         if isinstance(ets_forecast_table, pd.DataFrame) and not ets_forecast_table.empty:
@@ -49,7 +55,7 @@ class CBAMReportGenerator:
             metrics.update({
                 'ets_avg': prices.mean(),
                 'ets_max': prices.max(),
-                'ets_trend': "Bullish" if (prices.iloc[-1] > prices.iloc[0]) else "Bearish"
+                'ets_trend': "Bullish (Yükseliş Trendi)" if (prices.iloc[-1] > prices.iloc[0]) else "Bearish (Düşüş/Yatay Trend)"
             })
             
         if not cbam_df.empty:
@@ -58,51 +64,122 @@ class CBAMReportGenerator:
             
         return metrics
 
+    def format_emission_data(self, emission_analysis):
+        """Convert raw emission dict into a professional summary string"""
+        if not emission_analysis: return "Veri bulunamadı."
+        
+        lines = []
+        scope1 = emission_analysis.get('scope1', {})
+        if scope1:
+            lines.append("--- SCOPE 1 (Doğrudan Emisyonlar) ---")
+            for cat, ems in scope1.items():
+                if isinstance(ems, dict):
+                    for k, v in ems.items():
+                        if v > 0:
+                            lines.append(f"- {k.replace('_', ' ').title()}: {v:.2f} tCO2")
+                elif isinstance(ems, (int, float)) and cat.startswith('total_'):
+                     lines.append(f"**{cat.replace('_', ' ').upper()}**: {ems:.2f} tCO2")
+
+        scope2 = emission_analysis.get('scope2', {})
+        if scope2:
+            lines.append("\n--- SCOPE 2 (Dolaylı / Elektrik) ---")
+            lines.append(f"- Elektrik Tüketimi: {scope2.get('consumption_mwh', 0):,.2f} MWh")
+            lines.append(f"- Toplam Scope 2 Emisyonu: {scope2.get('total_scope2', 0):,.2f} tCO2")
+            lines.append(f"- Enerji Kaynağı: {scope2.get('description', 'Grid')}")
+            
+        lines.append(f"\n**TOPLAM EMİSYON**: {emission_analysis.get('total_emissions', 0):,.2f} tCO2")
+        return "\n".join(lines)
+
+    def format_optimization_data(self, optimization_scenarios):
+        """Format optimization scenarios into the format requested by the user"""
+        if not optimization_scenarios: return "Optimizasyon senaryosu hesaplanamadı."
+        
+        lines = []
+        for key, scenario in optimization_scenarios.items():
+            if key == 'combined': continue
+            
+            name = scenario.get('name', 'İyileştirme')
+            current = scenario.get('current_consumption', 0)
+            target = scenario.get('target_consumption', 0)
+            saving = scenario.get('emission_saving_tco2', 0)
+            cost_saving = scenario.get('annual_cbam_saving_eur', 0)
+            reduction = scenario.get('reduction_percent', 100)
+            
+            unit = "Nm³" if "natural_gas" in key else "tCO2 (Market-based)"
+            
+            lines.append(f"### {name}")
+            lines.append(f"✓ Mevcut kullanım: {current:,.2f} {unit} → Önerilen hedef: {target:,.2f} {unit} (%{reduction} azaltım)")
+            lines.append(f"✓ Yıllık Karbon Tasarrufu: {saving:,.2f} tCO2")
+            lines.append(f"✓ Yıllık CBAM Maliyet Tasarrufu: €{cost_saving:,.2f}")
+            lines.append(f"✓ Yatırım Geri Dönüşü (ROI): {scenario.get('roi_years', 0):,.1f} Yıl")
+            lines.append(f"✓ Uygulanacak Adımlar: {', '.join(scenario.get('measures', []))}")
+            lines.append("")
+            
+        return "\n".join(lines)
+
     def build_report_prompt(self, metrics, emission_analysis, optimization_scenarios):
-        """Construct a high-stakes partner-level prompt"""
+        """Construct a high-stakes partner-level prompt with specific numerical requirements"""
         
         prompt = f"""
-Sen bir **Global Stratejik Danışmanlık Firması (McKinsey, BCG, Deloitte)** Kıdemli Partnerisin. Görevin, bir Holding CEO'su ve Yönetim Kurulu için **"CBAM STRATEJİK MALİYET VE OPERASYONEL DÖNÜŞÜM ANALİZİ"** hazırlamaktır.
+Sen bir **Global Stratejik Danışmanlık Firması (McKinsey, BCG, Deloitte)** Kıdemli Partnerisin. Görevin, bir Holding CEO'su ve Yönetim Kurulu için kapsamlı bir **"CBAM STRATEJİK YÖNETİCİ RAPORU"** hazırlamaktır.
 
-Rapor tonu: **Kararlı, Vizyoner, Veri Odaklı ve Kesinlikle Resmi.** 
-Sunum dili kullanma, Adobe InDesign ile basılacak profesyonel bir "Thought Leadership" dökümanı gibi yaz.
+# 🎯 GÖREV
+Aşağıdaki başlıklar altında **yönetici raporu** hazırla:
 
-Analizini şu bölümler altında yapılandır:
+**ÖNEMLİ TALİMAT**: Bu rapor GERÇEK firma verileriyle hazırlanıyor. Aşağıdaki Scope 1&2 emisyon verilerini ve optimizasyon senaryolarını DOĞRUDAN KULLAN ve her öneride şu formatı uygula:
+✓ "Mevcut kullanım: X ton/Nm³/MWh → Önerilen hedef: Y → Tasarruf: Z tCO2"
+✓ Gerçek sayıları raporda belirt ve üzerinden somut öneriler sun.
 
-### 1. STRATEJİK YÖNETİCİ ÖZETİ VE STRATEJİK PERSPEKTİF
-- Şirketin AB Yeşil Mutabakatı altındaki kritik finansal konumu.
-- **Kritik Eşik**: Mevcut karbon yoğunluğunun sürdürülebilir karlılık üzerindeki net etkisi.
+### 1. EXECUTIVE SUMMARY (Yönetici Özeti)
+- Toplam CBAM risk tutarı (Projenlendirilen 2030 toplamı: €{metrics.get('projected_total_2030', 0):,.2f}) ve emisyon profili özeti (SAYILARLA).
+- Ana bulgular (2-3 cümle, GERÇEK verilerden çıkarım).
+- Kritik dönemler ve en büyük emisyon kaynakları.
 
-### 2. FİNANSAL RİSK MATRİSİ (2025-2030)
-- ETS fiyat volatilitesi ve CBAM sertifika maliyetlerinin nakit akışına kümülatif etkisi.
-- Karbon bazlı maliyetlerin ürün marjları üzerindeki baskı analizi.
+### 2. RISK ANALİZİ
+- Yüksek riskli dönemler (ETS fiyat artışı ile ilişkilendir). En yüksek maliyetli dönem: {metrics.get('highest_quarter', 'Bilinmiyor')}.
+- ETS fiyat volatilitesi ve tahmini trend ({metrics.get('ets_trend', 'Nötr')}).
+- Maliyet artış trendleri ve firma kâr marjı ({metrics.get('financials', {}).get('profit_margin', 0)}%) üzerindeki baskı.
 
-### 3. OPERASYONEL VERİMLİLİK VE EMİSYON PROFİLİ
-- Scope 1 & 2 dökümü üzerinden en yüksek iyileştirme potansiyeli olan süreçlerin tespiti.
-- Benchmark Analizi: Sektörel düşük karbon liderleriyle olan "Verimlilik Gap" analizi.
+### 3. EMİSYON ANALİZİ (Scope 1 & 2) - **ZORUNLU: GERÇEK VERİ KULLAN**
+Aşağıdaki teknik analiz verilerini kullanarak:
+- Her kaynak için mevcut kullanım MİKTARI (örn: "Elektrot: {metrics.get('total_emission', 0):,.2f} tCO2 toplam emisyon payı içerisinde...")
+- Toplam emisyon içindeki PAY (% olarak hesapla).
+- En yüksek 3 emisyon kaynakları sırala ve değerlerini belirt.
+- Her kaynak için iyileştirme potansiyeli değerlendir.
 
-### 4. YEŞİL SERMAYE VE KARBON YATIRIM STRATEJİSİ
-- Düşük karbonlu üretime geçişin bir maliyet değil, bir **Sermaye Geri Kazanımı** yatırımı olarak analizi.
-- Önerilen optimizasyonların ROI ve finansman kapasitesine (ESG Kredileri) çarpan etkisi.
+### 4. OPTİMİZASYON FIRSATLARİ - **SAYISAL HEDEFLERLE**
+Aşağıdaki senaryoları kullanarak her kaynak için:
+- "Mevcut: X → Hedef: Y (%Z azaltım) = W tCO2 tasarruf" formatını her kalem için uygula.
+- Her öneri için yatırım tutarı ve geri ödeme süresi (tahmini).
+- ROI hesabı (CBAM tasarrufu / yatırım maliyeti).
+- Önceliklendirme (hızlı kazanç vs uzun vadeli yatırım).
 
-### 5. 2030 STRATEJİK YOL HARİTASI
-- Kısa, orta ve uzun vadeli aksiyon planı.
-- Karbon nötr hedeflerinin pazar payı ve marka değeri üzerindeki kaldıraç etkisi.
+### 5. STRATEJİK ÖNERİLER - **FİRMANIN GERÇEK VERİLERİNE ÖZEL**
+Firmadaki mevcut tüketim bazında SOMUT adımlar:
+- Kısa vadeli (2025-2026): Operasyonel değişikliklerle hızlı kazanımlar.
+- Orta vadeli (2027-2028): Teknoloji yatırımları (Yenilenebilir enerji, proses değişikliği).
+- Uzun vadeli (2029-2030): Toplam emisyon hedefi ve karbon-nötr vizyonu.
+
+### 6. FİNANSAL ETKİ - **EURO BAZINDA NET HESAPLAR**
+- Şu anki durum: CBAM maliyeti €{metrics.get('current_cbam_cost', 0):,.2f}
+- Optimizasyonlar sonrası tahmini yıllık ve 2030 kümülatif tasarruf potansiyelleri.
+- Toplam yatırım ihtiyacı vs. 5 yıllık tasarruf karşılaştırması.
+
+### 7. SONUÇ VE TAVSİYELER
 
 ---
-## ANALİZ İÇİN DONELER (BU VERİLERİ METNE ENTEGRE ET):
-- **Firma**: {metrics.get('company_name')}
-- **Ürün**: {metrics.get('product')}
+## ANALİZ İÇİN TEKNİK VERİLER:
+- **Firma**: {metrics.get('company_name')} ({metrics.get('sector')} sektörü, {metrics.get('production_route')} rotası)
+- **Raporlama Dönemi**: {metrics.get('reporting_period', '2024')}
 - **Toplam Gömülü Emisyon**: {metrics.get('total_emission', 0):,.2f} tCO2e
-- **Mevcut CBAM Maruziyeti**: €{metrics.get('current_cbam_cost', 0):,.2f}
-- **Emisyon Envanteri**: {emission_analysis if emission_analysis else 'Detaylı veri bekleniyor'}
-- **Optimizasyon Hedefleri**: {optimization_scenarios if optimization_scenarios else 'Hesaplanıyor'}
+- **Mevcut İhracat Miktarı**: {metrics.get('export_quantity', 0):,.2f} Ton
+- **DETAYLI EMİSYON ANALİZİ (SAYILAR)**: 
+{emission_analysis}
 
-**TALİMATLAR**: 
-- Gerçekçi ve profesyonel ol. 
-- Türkçe karakterleri (ğ, ü, ş, i, ö, ç) kusursuz kullan. 
-- Önemli stratejik terimleri ve sayıları **bold** yap. 
-- Metne "The following table", "Based on my analysis" gibi dolgu cümlelerle başlama, doğrudan analize gir.
+- **OPTİMİZASYON SENARYOLARI (SAYILAR)**:
+{optimization_scenarios}
+
+**NOT**: Rapor Türkçe olmalı, profesyonel ve net bir dille yazılmalı. Rakamları vurgula (**bold**). Metne "Aşağıdaki tabloda..." gibi giriş yapmadan doğrudan yönetici özetiyle başla.
 """
         return prompt
 
@@ -114,7 +191,11 @@ Analizini şu bölümler altında yapılandır:
         cbam_df = self.add_risk_analysis(cbam_df)
         metrics = self.calculate_metrics(cbam_summary, ets_forecast_table, cbam_df)
         
-        prompt = self.build_report_prompt(metrics, emission_analysis, optimization_scenarios)
+        # Format technical data for the prompt
+        formatted_emissions = self.format_emission_data(emission_analysis)
+        formatted_optimizations = self.format_optimization_data(optimization_scenarios)
+        
+        prompt = self.build_report_prompt(metrics, formatted_emissions, formatted_optimizations)
         
         response = self.client.models.generate_content(model=model, contents=prompt)
         report_text = response.text

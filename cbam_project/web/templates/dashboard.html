@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kurumsal Dashboard - GreFins CBAM</title>
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='favicon.png') }}">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        pageBg: '#0B1121',
+                        cardBg: '#151E32',
+                        primary: '#C9FD02',
+                        textMain: '#FFFFFF',
+                        textMuted: '#94A3B8',
+                        borderDark: '#2D3748',
+                    }
+                }
+            }
+        }
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+</head>
+
+<body class="bg-pageBg text-textMain antialiased min-h-screen">
+    <!-- Navbar -->
+    <nav class="fixed top-0 left-0 right-0 z-50 bg-[#0B1121]/80 backdrop-blur-xl border-b border-borderDark/50">
+        <div class="max-w-[1400px] mx-auto px-6 h-20 flex items-center justify-between">
+            <div class="flex items-center gap-12">
+                <a href="/">
+                    <img src="{{ url_for('static', filename='favicon.png') }}" alt="GreFins" class="h-12 w-auto">
+                </a>
+                <div class="hidden lg:flex items-center gap-10">
+                    <a href="/"
+                        class="text-[11px] font-black uppercase tracking-widest text-textMuted hover:text-primary transition-colors">Ana
+                        Sayfa</a>
+                    <a href="/dashboard"
+                        class="text-[11px] font-black uppercase tracking-widest text-primary border-b-2 border-primary pb-1">Dashboard</a>
+                </div>
+            </div>
+            <div class="text-[10px] font-black text-textMuted uppercase tracking-widest opacity-50">
+                Corporate Intelligence v2.0
+            </div>
+        </div>
+    </nav>
+
+    <main class="pt-32 pb-20 px-6 max-w-[1400px] mx-auto">
+        <!-- Header -->
+        <div class="mb-16">
+            <h1 class="text-5xl md:text-7xl font-black tracking-tighter leading-none mb-4">Yönetim <span
+                    class="text-primary italic font-normal opacity-80">Paneli</span></h1>
+            <p class="text-textMuted text-lg font-medium max-w-2xl">Geçmiş analizlerin takibi, emisyon trendleri ve
+                kurumsal uyum izleme merkezi.</p>
+        </div>
+
+        <!-- Global Stats Grid -->
+        <div class="grid md:grid-cols-3 gap-8 mb-12">
+            <div class="bg-cardBg border border-borderDark rounded-[32px] p-8 shadow-2xl relative overflow-hidden">
+                <div class="absolute top-0 left-0 w-2 h-full bg-primary/40"></div>
+                <div class="text-[10px] text-textMuted uppercase font-black tracking-widest mb-4">Toplam Analiz Sayısı
+                </div>
+                <div class="text-5xl font-black tracking-tighter">{{ reports|length }}</div>
+            </div>
+            <div class="bg-cardBg border border-borderDark rounded-[32px] p-8 shadow-2xl">
+                <div class="text-[10px] text-textMuted uppercase font-black tracking-widest mb-4">Takip Edilen Sektörler
+                </div>
+                <div class="flex gap-3">
+                    <span
+                        class="bg-primary/10 text-primary px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest border border-primary/20">Demir-Çelik</span>
+                    <span
+                        class="bg-primary/10 text-primary px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest border border-primary/20">Alüminyum</span>
+                </div>
+            </div>
+            <div class="bg-cardBg border border-borderDark rounded-[32px] p-8 shadow-2xl">
+                <div class="text-[10px] text-textMuted uppercase font-black tracking-widest mb-4">Veri Kaynağı</div>
+                <div class="flex items-center gap-3">
+                    <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                    <span class="text-xs font-black uppercase tracking-widest">AWS Cloud Active</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid lg:grid-cols-12 gap-12">
+            <!-- Trend Chart -->
+            <div class="lg:col-span-8 bg-cardBg border border-borderDark rounded-[40px] p-10 shadow-2xl">
+                <h3 class="text-xs font-black uppercase tracking-[0.3em] text-primary mb-10 flex items-center gap-3">
+                    <span class="w-2 h-2 bg-primary rounded-full"></span>
+                    Emisyon Ve Maliyet Trend Analizi
+                </h3>
+                <div class="h-[400px]">
+                    <canvas id="trendChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Recent Activity Table -->
+            <div
+                class="lg:col-span-4 bg-[#090E1A] border border-borderDark rounded-[40px] p-8 shadow-2xl overflow-hidden">
+                <h3 class="text-xs font-black uppercase tracking-[0.3em] text-white mb-8">Son Aktiviteler</h3>
+                <div class="space-y-6 max-h-[500px] overflow-y-auto pr-2 custom-scrollbar">
+                    {% for report in reports %}
+                    <div
+                        class="p-6 bg-cardBg/50 border border-borderDark/50 rounded-2xl hover:border-primary/30 transition-all group">
+                        <div class="flex justify-between items-start mb-3">
+                            <div>
+                                <div class="text-xs font-black text-white group-hover:text-primary transition-colors">
+                                    {{ report.company_info.company_name if report.company_info else 'Adsız Analiz' }}
+                                </div>
+                                <div class="text-[9px] text-textMuted font-bold uppercase tracking-widest">
+                                    {{ report.created_at[:10] }} | {{ report.company_info.product_name if
+                                    report.company_info else 'Bilinmiyor' }}
+                                </div>
+                            </div>
+                            <span class="text-[10px] font-black text-primary">€{{
+                                "{:,.0f}".format(report.cbam_summary.cbam_cost if report.cbam_summary else 0) }}</span>
+                        </div>
+                        <div class="h-1 bg-pageBg rounded-full overflow-hidden">
+                            <div class="h-full bg-primary/40 w-[60%]"></div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Full History Table -->
+        <div class="mt-16 bg-cardBg border border-borderDark rounded-[40px] overflow-hidden shadow-2xl">
+            <div class="p-10 border-b border-borderDark/50">
+                <h3 class="text-xl font-black tracking-tighter">Detaylı Rapor Geçmişi</h3>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left">
+                    <thead class="bg-[#090E1A] text-[10px] font-black uppercase tracking-[0.2em] text-textMuted">
+                        <tr>
+                            <th class="p-8">Tarih</th>
+                            <th class="p-8">Firma</th>
+                            <th class="p-8">Ürün</th>
+                            <th class="p-8">Sektör</th>
+                            <th class="p-8">Emisyon (tCO2)</th>
+                            <th class="p-8">CBAM (€)</th>
+                            <th class="p-8">Durum</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-borderDark/30">
+                        {% for r in reports %}
+                        <tr class="hover:bg-white/[0.02] transition-colors">
+                            <td class="p-8 text-xs font-bold">{{ r.created_at[:16].replace('T', ' ') }}</td>
+                            <td class="p-8 text-sm font-black text-white">{{ r.company_info.company_name if
+                                r.company_info else 'N/A' }}</td>
+                            <td class="p-8 text-xs">{{ r.company_info.product_name if r.company_info else 'N/A' }}</td>
+                            <td class="p-8 border-none">
+                                <span
+                                    class="bg-white/5 px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest text-textMuted border border-borderDark">
+                                    {{ r.company_info.sector if r.company_info else 'N/A' }}
+                                </span>
+                            </td>
+                            <td class="p-8 font-bold">
+                                {{ "{:,.1f}".format(r.emission_analysis.total_emissions if r.emission_analysis else
+                                (r.cbam_summary.total_emission if r.cbam_summary else 0)) }}
+                            </td>
+                            <td class="p-8 font-black text-primary">
+                                €{{ "{:,.0f}".format(r.cbam_summary.cbam_cost if r.cbam_summary else 0) }}
+                            </td>
+                            <td class="p-8">
+                                <div class="flex items-center gap-2">
+                                    <div class="w-1.5 h-1.5 bg-primary rounded-full"></div>
+                                    <span class="text-[9px] font-black uppercase tracking-tighter">Arşivlendi</span>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <script id="trend-data" type="application/json">
+        {{ trend_data | tojson }}
+    </script>
+
+    <script>
+        const trendData = JSON.parse(document.getElementById('trend-data').textContent);
+
+        const ctx = document.getElementById('trendChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: trendData.map(d => d.date),
+                datasets: [
+                    {
+                        label: 'Emisyon (tCO2)',
+                        data: trendData.map(d => d.emissions),
+                        borderColor: '#C9FD02',
+                        backgroundColor: 'rgba(201, 253, 2, 0.1)',
+                        borderWidth: 4,
+                        tension: 0.4,
+                        fill: true,
+                        yAxisID: 'y'
+                    },
+                    {
+                        label: 'CBAM Maliyeti (€)',
+                        data: trendData.map(d => d.cost),
+                        borderColor: '#94A3B8',
+                        borderWidth: 2,
+                        borderDash: [5, 5],
+                        tension: 0.4,
+                        fill: false,
+                        yAxisID: 'y1'
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: {
+                    mode: 'index',
+                    intersect: false,
+                },
+                plugins: {
+                    legend: {
+                        position: 'top',
+                        labels: {
+                            color: '#94A3B8',
+                            font: { weight: 'bold', size: 11, family: 'sans-serif' }
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: '#151E32',
+                        titleColor: '#C9FD02',
+                        bodyColor: '#FFFFFF',
+                        borderColor: '#2D3748',
+                        borderWidth: 1
+                    }
+                },
+                scales: {
+                    x: {
+                        ticks: { color: '#94A3B8', font: { size: 10 } },
+                        grid: { display: false }
+                    },
+                    y: {
+                        type: 'linear',
+                        display: true,
+                        position: 'left',
+                        ticks: { color: '#C9FD02' },
+                        grid: { color: 'rgba(255, 255, 255, 0.05)' }
+                    },
+                    y1: {
+                        type: 'linear',
+                        display: true,
+                        position: 'right',
+                        ticks: { color: '#94A3B8' },
+                        grid: { drawOnChartArea: false }
+                    }
+                }
+            }
+        });
+    </script>
+    <style>
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #2D3748;
+            border-radius: 10px;
+        }
+    </style>
+</body>
+
+</html>

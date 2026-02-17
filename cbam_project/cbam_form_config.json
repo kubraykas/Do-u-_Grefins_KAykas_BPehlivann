@@ -1,0 +1,224 @@
+{
+  "app_config": {
+    "title": "GreFins: CBAM & Karbon Maliyet Hesaplayıcı",
+    "version": "1.2.0 (ISO-14064 Compliant)",
+    "currency": "EUR"
+  },
+  "sectors": {
+    "iron_steel": {
+      "label": "Demir - Çelik (Iron & Steel)",
+      "cn_codes_prefix": ["72", "73"],
+      "routes": {
+        "eaf": {
+          "label": "Elektrik Ark Ocağı (Electric Arc Furnace - EAF)",
+          "description": "Hurda ve elektrik yoğunluklu üretim.",
+          "is_default": true
+        },
+        "bof": {
+          "label": "Entegre Tesis (Blast Furnace - BOF)",
+          "description": "Cevher ve kömür bazlı üretim."
+        },
+        "rerolling": {
+          "label": "Haddehane (Re-rolling)",
+          "description": "Sadece şekillendirme (Yarı mamul işleme)."
+        }
+      },
+      "inputs": {
+        "production": [
+          {
+            "id": "production_quantity",
+            "label": "Yıllık Toplam Üretim",
+            "unit": "Ton",
+            "type": "number_input",
+            "min": 0,
+            "help": "Fabrikanın yıllık toplam nihai ürün çıktısı."
+          },
+          {
+            "id": "scrap_ratio",
+            "label": "Hurda Kullanım Oranı",
+            "unit": "%",
+            "type": "slider",
+            "min": 0,
+            "max": 100,
+            "default": 70,
+            "help": "EAF tesisleri için kritiktir. Hurda oranı arttıkça karbon vergisi düşer.",
+            "impact": "high_optimization"
+          }
+        ],
+        "scope_1_process": [
+          {
+            "id": "electrode_consumption",
+            "label": "Elektrot Tüketimi (Net)",
+            "unit": "kg/ton",
+            "type": "number_input",
+            "default": 1.8,
+            "min": 0,
+            "max": 5.0,
+            "help": "Ark ocaklarında eriyen grafit elektrotlar doğrudan CO2 kaynağıdır.",
+            "show_if_route": ["eaf"]
+          },
+          {
+            "id": "reductants",
+            "label": "Kömür / Antrasit / Kok Enjeksiyonu",
+            "unit": "kg/ton",
+            "type": "number_input",
+            "default": 15.0,
+            "help": "Çeliğe karbon kazandırmak veya kimyasal enerji için eklenen karbon."
+          },
+          {
+            "id": "fluxes",
+            "label": "Kireçtaşı / Dolomit Tüketimi",
+            "unit": "kg/ton",
+            "type": "number_input",
+            "default": 40.0,
+            "help": "Cüruf yapıcı malzemelerin kalsinasyon emisyonu."
+          }
+        ],
+        "scope_1_fuel": [
+          {
+            "id": "natural_gas",
+            "label": "Doğalgaz Tüketimi",
+            "unit": "m3/yıl",
+            "type": "number_input",
+            "default": 500000,
+            "help": "Pota ısıtma, tandiş ve tav fırınlarında kullanılan yakıt."
+          }
+        ],
+        "scope_2": [
+          {
+            "id": "electricity_consumption",
+            "label": "Toplam Elektrik Tüketimi",
+            "unit": "MWh/yıl",
+            "type": "number_input",
+            "help": "Tesisin toplam elektrik faturası."
+          },
+          {
+            "id": "energy_source_type",
+            "label": "Elektrik Tedarik Kaynağı",
+            "type": "selectbox",
+            "options": [
+              {"value": "grid_mix", "label": "Standart Şebeke (TR Mix)"},
+              {"value": "green_ppa", "label": "I-REC / Yeşil Enerji (0 Emisyon)"},
+              {"value": "hybrid", "label": "Hibrit (Şebeke + Çatı GES)"}
+            ],
+            "help": "Yeşil enerji seçimi Scope 2 vergisini sıfırlar."
+          }
+        ]
+      }
+    },
+    "aluminum": {
+      "label": "Alüminyum (Aluminium)",
+      "cn_codes_prefix": ["76"],
+      "routes": {
+        "primary": {
+          "label": "Birincil Alüminyum (Elektroliz)",
+          "is_default": true
+        },
+        "secondary": {
+          "label": "İkincil / Geri Dönüşüm"
+        }
+      },
+      "inputs": {
+        "production": [
+          {
+            "id": "production_quantity",
+            "label": "Yıllık Üretim",
+            "unit": "Ton",
+            "type": "number_input"
+          }
+        ],
+        "scope_1_process": [
+          {
+            "id": "net_anode_consumption",
+            "label": "Net Anot Tüketimi",
+            "unit": "kg/ton Al",
+            "type": "number_input",
+            "default": 420,
+            "help": "Elektroliz sırasında tüketilen karbon anotlar.",
+            "show_if_route": ["primary"]
+          },
+          {
+            "id": "pfc_emissions_factor",
+            "label": "PFC Gaz Etkisi (CF4 + C2F6)",
+            "unit": "tCO2e/ton",
+            "type": "number_input",
+            "default": 0.4,
+            "help": "Anot etkisi sıklığına bağlı perflorokarbon emisyonları."
+          }
+        ],
+        "scope_2": [
+           {
+            "id": "electricity_consumption",
+            "label": "Elektroliz Elektrik Tüketimi",
+            "unit": "MWh/yıl",
+            "type": "number_input",
+            "help": "Alüminyum üretiminin en büyük kalemi (Genelde 13-15 MWh/ton)."
+          },
+          {
+            "id": "energy_source_type",
+            "label": "Elektrik Kaynağı",
+            "type": "selectbox",
+            "options": [
+              {"value": "grid_mix", "label": "Şebeke"},
+              {"value": "green_ppa", "label": "Yeşil Enerji / Hidro"}
+            ]
+          }
+        ]
+      }
+    },
+    "cement": {
+      "label": "Çimento (Cement)",
+      "cn_codes_prefix": ["2523"],
+      "routes": {
+        "integrated": {"label": "Entegre (Klinker + Çimento)", "is_default": true},
+        "grinding": {"label": "Öğütme Tesisi (Sadece Çimento)"}
+      },
+      "inputs": {
+        "production": [
+           {
+            "id": "clinker_ratio",
+            "label": "Klinker Oranı",
+            "unit": "%",
+            "type": "slider",
+            "min": 50,
+            "max": 95,
+            "default": 80,
+            "help": "Çimentonun içindeki klinker oranı ne kadar düşükse vergi o kadar azalır.",
+            "impact": "high_optimization"
+          }
+        ],
+        "scope_1_process": [
+          {
+            "id": "calcination_factor",
+            "label": "Kalsinasyon Emisyon Faktörü",
+            "unit": "kg CO2/ton Klinker",
+            "type": "number_input",
+            "default": 525,
+            "disabled": true,
+            "help": "Kireçtaşının (CaCO3) CaO'ya dönüşmesi sırasındaki kimyasal emisyon. (Standart değer)."
+          }
+        ]
+      }
+    }
+  },
+  "financials": {
+    "label": "Finansal Veriler (CFO Analizi İçin)",
+    "inputs": [
+      {
+        "id": "export_share",
+        "label": "AB'ye İhracat Oranı",
+        "unit": "%",
+        "type": "slider",
+        "default": 40
+      },
+      {
+        "id": "electricity_price",
+        "label": "Ortalama Elektrik Birim Maliyeti",
+        "unit": "EUR/MWh",
+        "type": "number_input",
+        "default": 90,
+        "help": "ROI (Yatırım Geri Dönüş) hesabı için gereklidir."
+      }
+    ]
+  }
+}

@@ -24,7 +24,7 @@
         }
     </script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=4">
 </head>
 
@@ -187,49 +187,61 @@
                     <div class="flex items-center gap-6 mb-10">
                         <div class="h-px flex-1 bg-borderDark/50"></div>
                         <h2 class="text-xs font-black uppercase tracking-[0.4em] text-primary whitespace-nowrap">
-                            Stratejik Optimizasyon</h2>
+                            Stratejik Optimizasyon Modelleri</h2>
                         <div class="h-px flex-1 bg-borderDark/50"></div>
                     </div>
-                    <div
-                        class="bg-primary p-12 rounded-[40px] text-pageBg shadow-[0_0_50px_rgba(201,253,2,0.15)] transform hover:scale-[1.01] transition-all">
-                        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-12 mb-16">
-                            <div class="space-y-4">
-                                <h3 class="text-5xl font-black uppercase tracking-tighter leading-none">Maksimum
-                                    Verimlilik</h3>
-                                <p class="text-lg font-bold opacity-70">Entegre optimizasyon önlemleri ile 6 yıllık
-                                    projeksiyon.</p>
+
+                    <div class="space-y-6">
+                        {% for key, scenario in (optimization_scenarios.items() if optimization_scenarios is mapping
+                        else optimization_scenarios) %}
+                        {% if key != 'combined' %}
+                        <div
+                            class="bg-cardBg border border-borderDark rounded-[32px] p-10 shadow-2xl relative overflow-hidden group">
+                            <div class="absolute top-0 right-0 p-8">
+                                <span class="text-primary font-black text-xs tracking-widest uppercase">ROI: {{
+                                    "{:.1f}".format(scenario.get('roi_years', 0)) }} Yıl</span>
                             </div>
-                            <div class="text-right">
-                                <div class="text-[11px] font-black uppercase tracking-[0.2em] opacity-50 mb-2">Toplam
-                                    Tasarruf</div>
-                                <div class="text-6xl font-black tracking-tighter">€{{
-                                    "{:,.0f}".format(cbam_summary['cbam_cost'] * 0.25 * 6) }}</div>
+                            <div class="mb-8">
+                                <h3 class="text-2xl font-black text-white mb-2">{{ scenario.get('name', 'İyileştirme')
+                                    }}</h3>
+                                <div class="flex gap-4">
+                                    {% for step in scenario.get('measures', []) %}
+                                    <span
+                                        class="text-[9px] font-black text-textMuted uppercase tracking-widest bg-white/5 px-3 py-1 rounded-full">{{
+                                        step }}</span>
+                                    {% endfor %}
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-8 pt-8 border-t border-borderDark/30">
+                                <div>
+                                    <div class="text-[9px] font-black text-textMuted uppercase tracking-widest mb-1">
+                                        Emisyon Tasarrufu</div>
+                                    <div class="text-2xl font-black text-primary">{{
+                                        "{:,.1f}".format(scenario.get('emission_saving_tco2', 0)) }} tCO2</div>
+                                </div>
+                                <div>
+                                    <div class="text-[9px] font-black text-textMuted uppercase tracking-widest mb-1">
+                                        Maliyet Tasarrufu</div>
+                                    <div class="text-2xl font-black text-white">€{{
+                                        "{:,.0f}".format(scenario.get('annual_cbam_saving_eur', 0)) }}</div>
+                                </div>
+                                <div>
+                                    <div class="text-[9px] font-black text-textMuted uppercase tracking-widest mb-1">
+                                        Azaltım Hedefi</div>
+                                    <div class="text-2xl font-black text-white">%{{ scenario.get('reduction_percent', 0)
+                                        }}</div>
+                                </div>
+                                <div class="text-right">
+                                    <button
+                                        class="text-[10px] font-black text-pageBg bg-primary px-6 py-3 rounded-full uppercase tracking-tighter hover:scale-105 transition-all">
+                                        Detaylı Plan
+                                    </button>
+                                </div>
                             </div>
                         </div>
-                        <div class="grid grid-cols-2 md:grid-cols-4 gap-10 pt-12 border-t border-black/10">
-                            <div class="space-y-2">
-                                <div class="text-[10px] font-black uppercase tracking-widest opacity-40">Emisyon
-                                    Azaltımı</div>
-                                <div class="text-3xl font-black">25%</div>
-                            </div>
-                            <div class="space-y-2">
-                                <div class="text-[10px] font-black uppercase tracking-widest opacity-40">Yıllık Kazanç
-                                </div>
-                                <div class="text-3xl font-black">€{{ "{:,.0f}".format(cbam_summary['cbam_cost'] * 0.25)
-                                    }}
-                                </div>
-                            </div>
-                            <div class="space-y-2">
-                                <div class="text-[10px] font-black uppercase tracking-widest opacity-40">ROI Hedefi
-                                </div>
-                                <div class="text-3xl font-black">2.4 Yıl</div>
-                            </div>
-                            <div class="space-y-2">
-                                <div class="text-[10px] font-black uppercase tracking-widest opacity-40">Vergi Avantajı
-                                </div>
-                                <div class="text-3xl font-black text-right">L1</div>
-                            </div>
-                        </div>
+                        {% endif %}
+                        {% endfor %}
                     </div>
                 </section>
                 {% endif %}
@@ -250,7 +262,19 @@
         </footer>
     </div>
 
+    <!-- Verileri JS tarafına güvenli aktarmak için JSON blokları -->
+    <script id="analysis-data" type="application/json">
+    {
+        "scope1": {{ (emission_analysis.get('scope1', {}).get('total_scope1', 0) if emission_analysis else 0) | tojson }},
+        "scope2": {{ (emission_analysis.get('scope2', {}).get('total_scope2', 0) if emission_analysis else 0) | tojson }},
+        "forecast": {{ ets_forecast | tojson }}
+    }
+    </script>
+
     <script>
+        // Data Loading from JSON block
+        const analysisData = JSON.parse(document.getElementById('analysis-data').textContent);
+
         // Markdown Rendering
         const contentDiv = document.getElementById('markdown-content');
         if (contentDiv) {
@@ -265,71 +289,72 @@
 
         // 1. Emission Pie Chart
         const emissionCtx = document.getElementById('emissionChart').getContext('2d');
-        const scope1Val = {{ (emission_analysis.scope1.total_scope1 if emission_analysis and emission_analysis.scope1 else 0) | tojson }};
-        const scope2Val = {{ (emission_analysis.scope2.total_scope2 if emission_analysis and emission_analysis.scope2 else 0) | tojson }};
-
-        new Chart(emissionCtx, {
-            type: 'doughnut',
-            data: {
-                labels: ['Scope 1', 'Scope 2'],
-                datasets: [{
-                    data: [scope1Val, scope2Val],
-                    backgroundColor: [primaryColor, '#10b981'],
-                    borderColor: '#151E32',
-                    borderWidth: 4
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: {
-                        position: 'bottom',
-                        labels: { color: mutedColor, font: { weight: 'bold', size: 10 } }
-                    }
+        if (analysisData.scope1 > 0 || analysisData.scope2 > 0) {
+            new Chart(emissionCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Scope 1', 'Scope 2'],
+                    datasets: [{
+                        data: [analysisData.scope1, analysisData.scope2],
+                        backgroundColor: [primaryColor, '#10b981'],
+                        borderColor: '#151E32',
+                        borderWidth: 4
+                    }]
                 },
-                cutout: '70%'
-            }
-        });
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: { color: mutedColor, font: { weight: 'bold', size: 10 } }
+                        }
+                    },
+                    cutout: '70%'
+                }
+            });
+        }
 
         // 2. Cost Projection Line Chart
         const costCtx = document.getElementById('costChart').getContext('2d');
-        const forecastData = {{ ets_forecast | tojson }};
-        const labels = forecastData.map(d => d.Quarter);
-        const prices = forecastData.map(d => d['Forecasted Value']);
+        const forecast = analysisData.forecast;
+        if (forecast && forecast.length > 0) {
+            const labels = forecast.map(d => d.Id || d.Quarter);
+            const prices = forecast.map(d => d['Predicted_Price'] || d['Forecasted Value'] || 0);
 
-        new Chart(costCtx, {
-            type: 'line',
-            data: {
-                labels: labels,
-                datasets: [{
-                    label: 'ETS Fiyatı (€)',
-                    data: prices,
-                    borderColor: primaryColor,
-                    backgroundColor: 'rgba(201, 253, 2, 0.1)',
-                    borderWidth: 3,
-                    fill: true,
-                    tension: 0.4,
-                    pointBackgroundColor: primaryColor,
-                    pointBorderColor: '#151E32',
-                    pointBorderWidth: 2,
-                    pointRadius: 4
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: { legend: { display: false } },
-                scales: {
-                    x: {
-                        grid: { display: false },
-                        ticks: { color: mutedColor, font: { size: 9 } }
-                    },
-                    y: {
-                        grid: { color: 'rgba(255, 255, 255, 0.05)' },
-                        ticks: { color: mutedColor, font: { size: 9 } }
+            new Chart(costCtx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'ETS Fiyatı (€)',
+                        data: prices,
+                        borderColor: primaryColor,
+                        backgroundColor: 'rgba(201, 253, 2, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4,
+                        pointBackgroundColor: primaryColor,
+                        pointBorderColor: '#151E32',
+                        pointBorderWidth: 2,
+                        pointRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: {
+                            grid: { display: false },
+                            ticks: { color: mutedColor, font: { size: 9 } }
+                        },
+                        y: {
+                            grid: { color: 'rgba(255, 255, 255, 0.05)' },
+                            ticks: { color: mutedColor, font: { size: 9 } }
+                        }
                     }
                 }
-            }
-        });
+            });
+        }
     </script>
 </body>
 
