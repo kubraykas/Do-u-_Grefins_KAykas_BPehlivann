@@ -24,50 +24,50 @@ class ETSPricePredictor:
     
     def load_data(self, csv_path):
         """
-        Load and preprocess historical ETS price data
-        
-        Args:
-            csv_path (str): Path to CSV file with ETS price data
-            
-        Returns:
-            pandas.DataFrame: Cleaned time series data
+        Load and preprocess historical ETS price data with robust handling
         """
-        # Load CSV
-        df = pd.read_csv(csv_path, header=None)
-        
-        # Parse header and split columns
-        header = df.iloc[0, 0].split(',')
-        df_split = df[0].str.split(',', expand=True)
-        df_split.columns = header
-        df = df_split.iloc[1:].reset_index(drop=True)
-        df = df.iloc[:, :-1]
-        
-        # Clean column names
-        df.columns = df.columns.str.replace('"', '').str.strip()
-        
-        # Rename columns
-        df = df.rename(columns={
-            'Date': 'date',
-            'Primary Market': 'ETS Price'
-        })
-        
-        # Convert date
-        df['date'] = pd.to_datetime(df['date'], errors='coerce')
-        
-        # Convert price to numeric
-        df['ETS Price'] = (
-            df['ETS Price']
-            .astype(str)
-            .str.replace(',', '')
-            .str.strip()
-        )
-        df['ETS Price'] = pd.to_numeric(df['ETS Price'], errors='coerce')
-        
-        # Set index and clean
-        df = df.set_index('date')
-        df = df[['ETS Price']]
-        df = df.dropna()
-        df = df.sort_index()
+        # Load CSV efficiently
+        try:
+            # BOM ve farklı kodlamaları da yönetmek için 'utf-8-sig' kullanıyoruz
+            df = pd.read_csv(csv_path, encoding='utf-8-sig')
+            
+            # Tüm sütun isimlerini temizle (boşluklar ve tırnaklar)
+            df.columns = df.columns.astype(str).str.replace('"', '').str.strip()
+            
+            # Sütun isimlerini küçük harfe çevirerek daha kolay eşleşme sağla
+            col_map = {c.lower(): c for c in df.columns}
+            
+            # 'Date' sütununu bul (büyük-küçük harf duyarsız)
+            date_col = next((col_map[k] for k in ['date', 'tarih'] if k in col_map), None)
+            # 'Primary Market' veya 'Price' sütununu bul
+            price_col = next((col_map[k] for k in ['primary market', 'ets price', 'price', 'fiyat'] if k in col_map), None)
+            
+            if not date_col or not price_col:
+                raise ValueError(f"Gerekli sütunlar bulunamadı. Mevcut sütunlar: {list(df.columns)}")
+
+            # Sütunları standart isimlere çevir
+            df = df.rename(columns={date_col: 'date', price_col: 'ETS Price'})
+            
+            # Tarih dönüşümü
+            df['date'] = pd.to_datetime(df['date'], errors='coerce')
+            
+            # Fiyat dönüşümü (Sayısal olmayan değerleri temizle)
+            df['ETS Price'] = pd.to_numeric(
+                df['ETS Price'].astype(str).str.replace(',', '').str.replace('€', '').str.strip(), 
+                errors='coerce'
+            )
+            
+            # Temizlik ve indexleme
+            df = df.dropna(subset=['date', 'ETS Price'])
+            df = df.set_index('date')
+            df = df[['ETS Price']]
+            df = df.sort_index()
+            
+            return df
+            
+        except Exception as e:
+            print(f"❌ Veri Yükleme Hatası: {e}")
+            raise e
         
         return df
     

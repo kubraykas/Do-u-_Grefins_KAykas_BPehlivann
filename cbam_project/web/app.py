@@ -263,16 +263,28 @@ def full_analysis():
         quantity = float(request.form['quantity'])
         cn_code = request.form['cn_code']
         
-        # CSV path - projede veya masaüstünde
-        csv_path = os.getenv('ETS_CSV_PATH', 'C:\\Users\\LENOVO\\Desktop\\icap-graph-price-data-2014-01-01-2025-11-21.csv')
+        # CSV path - projede veya Render secrets klasöründe
+        csv_path = os.getenv('ETS_CSV_PATH', 'icap-graph-price-data-2014-01-01-2025-11-21.csv')
         
-        # Alternatif path denemeleri
-        if not os.path.exists(csv_path):
-            csv_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'data', 'icap-graph-price-data-2014-01-01-2025-11-21.csv')
+        # Alternatif path denemeleri (Render Secret Files yolu dahil)
+        search_paths = [
+            csv_path,
+            os.path.join('/etc/secrets', os.path.basename(csv_path)),
+            os.path.join(os.path.dirname(os.path.dirname(__file__)), 'data', os.path.basename(csv_path)),
+            os.path.join(os.path.dirname(os.path.dirname(__file__)), os.path.basename(csv_path))
+        ]
         
-        if not os.path.exists(csv_path):
+        found_path = None
+        for p in search_paths:
+            if os.path.exists(p):
+                found_path = p
+                break
+        
+        if not found_path:
             return render_template('error.html', 
-                                 error=f"ETS fiyat CSV dosyası bulunamadı: {csv_path}")
+                                 error=f"ETS fiyat CSV dosyası bulunamadı. Lütfen Render Secrets alanına dosyayı eklediğinizden emin olun.")
+        
+        csv_path = found_path
         
         # === ADIM 1: CBAM HESAPLAMA ===
         calc = CBAMCalculator(ets_price)
