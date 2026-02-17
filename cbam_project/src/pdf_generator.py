@@ -33,22 +33,34 @@ COLOR_TEXT_MUTED = colors.HexColor('#94A3B8')
 COLOR_BORDER = colors.HexColor('#2D3748')
 COLOR_WHITE = colors.HexColor('#FFFFFF')
 
-LOGO_PATH = "/Users/busrapehlivan/grefinsdogus/Do-u-_Grefins_KAykas_BPehlivann/cbam_project/favicon.png"
+# Dinamik Logo Yolu
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+LOGO_PATH = os.path.join(BASE_DIR, "favicon.png")
 
-# --- FONT REGISTRATION ---
+# --- FONT REGISTRATION (Linux & MacOS Compatibility) ---
 def register_premium_fonts():
+    # Linux (Render), MacOS ve Windows için yaygın font yolları
     paths = [
+        # Linux / Render yolları
+        "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
+        "/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf",
+        # MacOS yolları
         "/System/Library/Fonts/Supplemental/Arial.ttf",
         "/Library/Fonts/Arial.ttf",
+    ]
+    
+    bold_paths = [
+        "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",
+        "/usr/share/fonts/truetype/liberation/LiberationSans-Bold.ttf",
         "/System/Library/Fonts/Supplemental/Arial Bold.ttf",
-        "/Library/Fonts/Arial Bold.ttf"
+        "/Library/Fonts/Arial Bold.ttf",
     ]
     
     reg_name = "PremiumSans"
     bold_name = "PremiumSans-Bold"
     
-    regular_path = next((p for p in paths if os.path.exists(p) and "Bold" not in p), None)
-    bold_path = next((p for p in paths if os.path.exists(p) and "Bold" in p), None)
+    regular_path = next((p for p in paths if os.path.exists(p)), None)
+    bold_path = next((p for p in bold_paths if os.path.exists(p)), None)
     
     if regular_path:
         pdfmetrics.registerFont(TTFont(reg_name, regular_path))
@@ -58,6 +70,7 @@ def register_premium_fonts():
             pdfmetrics.registerFont(TTFont(bold_name, regular_path))
         return reg_name, bold_name
     else:
+        # Emergency Fallback for standard PDF fonts
         return "Helvetica", "Helvetica-Bold"
 
 FONT_REG, FONT_BOLD = register_premium_fonts()
